@@ -29,8 +29,8 @@ const fullName = computed(() => {
 		:src="lecturer?.avatar_link ?? Placeholder"
 		alt="Фотография преподавателя"
 		class="image"
-		width="400"
-		height="400"
+		width="256"
+		height="256"
 	/>
 	<h2 class="full-name">{{ fullName }}</h2>
 </template>
@@ -39,6 +39,10 @@ const fullName = computed(() => {
 .image {
 	align-self: center;
 	margin-bottom: 16px;
+	aspect-ratio: 1;
+	height: auto;
+	width: 100%;
+	max-width: 256px;
 }
 
 .full-name {

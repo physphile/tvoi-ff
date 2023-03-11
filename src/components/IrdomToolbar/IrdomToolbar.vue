@@ -69,7 +69,7 @@ withDefaults(defineProps<Props>(), {
 	position: sticky;
 	top: 0;
 	z-index: 999;
-	height: 56px;
+	height: var(--toolbar-height);
 	width: 100%;
 	background: var(--color-primary-dark);
 	color: white;

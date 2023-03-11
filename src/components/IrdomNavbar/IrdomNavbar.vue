@@ -21,7 +21,7 @@ defineProps<{
 <style scoped>
 .nav {
 	width: 100%;
-	height: 56px;
+	height: var(--navbar-height);
 	background: var(--color-primary-dark);
 	color: white;
 }

@@ -47,7 +47,7 @@ watch(date, () => {
 		<template #toolbar>
 			<CalendarDropdown :date="date" />
 		</template>
-		<template #outer>
+		<template #body>
 			<DateNavigation :date="date" />
 		</template>
 

@@ -15,13 +15,20 @@ defineProps<{
 		<slot name="toolbar" />
 	</IrdomToolbar>
 
-	<slot name="outer" />
+	<slot name="body" />
 
-	<main class="scroll" v-bind="$props">
-		<div class="container main">
-			<slot />
-		</div>
+	<main class="container main" v-bind="$props">
+		<slot />
 	</main>
 </template>
 
-<style scoped></style>
+<style scoped>
+.main {
+	padding: 10px 8px;
+	display: flex;
+	flex-direction: column;
+	flex: 1;
+
+	overflow-y: auto;
+}
+</style>
