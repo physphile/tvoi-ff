@@ -8,11 +8,12 @@ on:
   #push:
   #  - workflows: ci-cd-container-registry-serverless
   #    filter:
-  #      branches: ["master"]
+  #      branches: ["main"]
   pull_request:
     - workflows: ci-cd-container-registry-serverless
       filter:
-        branches: ["main"]
+        source_branches: ["**", "!test**"]
+        target_branches: "main"
 
 workflows:
   ci-cd-container-registry-serverless:
