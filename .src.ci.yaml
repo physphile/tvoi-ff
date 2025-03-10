@@ -12,7 +12,7 @@ on:
   pull_request:
     - workflows: ci-cd-container-registry-serverless
       filter:
-        branches: ["master"]
+        branches: ["main"]
 
 workflows:
   ci-cd-container-registry-serverless:
