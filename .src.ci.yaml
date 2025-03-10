@@ -1,0 +1,58 @@
+# Для работы данного CI/CD вам необходимо создать следующие ресурсы в Yandex Cloud:
+# - Container Registry
+# - Serverless Container
+# - Service Account
+# Также необходимо создать секретный ключ для доступа к Container Registry и Service Account
+
+on:
+  #push:
+  #  - workflows: ci-cd-container-registry-serverless
+  #    filter:
+  #      branches: ["master"]
+  pull_request:
+    - workflows: ci-cd-container-registry-serverless
+      filter:
+        branches: ["master"]
+
+workflows:
+  ci-cd-container-registry-serverless:
+    tasks:
+      - build-push-deploy-serverless
+
+tasks:
+  - name: build-push-deploy-serverless
+    env:
+      YC_DOCKER_REGISTRY_URI: cr.yandex/crpn9hemlidi718gq9es
+      IMAGE_NAME: tvoi-ff
+      YC_SERVERLESS_CONTAINER_NAME: tvoi-ff
+      YC_SERVICE_ACCOUNT_ID: sourcecraft
+      YC_AUTHORIZED_KEY_JSON: ${{ secrets.service-account-key }}
+      YC_FOLDER_ID: sourcecraft
+    cubes:
+      - name: install-yc
+        script:
+          - curl -o ./yc-install.sh -L https://storage.yandexcloud.net/yandexcloud-yc/install.sh | bash -s -- -a
+          - echo 'source /root/yandex-cloud/completion.zsh.inc' >>  ~/.zshrc
+          - chmod +x ./yc-install.sh && ./yc-install.sh -i /tmp/yc -n && mv /tmp/yc/bin/yc /usr/bin/yc
+          - echo "$YC_AUTHORIZED_KEY_JSON" > key.json
+          - yc config profile create sa-profile
+          - yc config set service-account-key key.json
+          - yc config set format json
+          - yc config set folder-id $YC_FOLDER_ID
+
+      - name: docker-login
+        script:
+          - yc container registry configure-docker --profile sa-profile
+
+      - name: docker-build-push
+        script:
+          - docker build --tag $YC_DOCKER_REGISTRY_URI/$IMAGE_NAME --platform linux/amd64 .
+          - docker push $YC_DOCKER_REGISTRY_URI/$IMAGE_NAME:latest
+
+      - name: docker-logout
+        script:
+          - docker logout $YC_DOCKER_REGISTRY_URI
+
+      - name: create-serverless
+        script:
+          - yc serverless container revision deploy  --container-name $YC_SERVERLESS_CONTAINER_NAME --image $YC_DOCKER_REGISTRY_URI/$IMAGE_NAME:latest --service-account-id $YC_SERVICE_ACCOUNT_ID

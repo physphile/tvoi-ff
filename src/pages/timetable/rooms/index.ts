@@ -1,0 +1,1 @@
+export { TimetableRoomPage } from "./TimetableRoomPage";

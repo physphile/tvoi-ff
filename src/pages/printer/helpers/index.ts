@@ -1,0 +1,1 @@
+export { getIsUnionMember } from './getIsUnionMember';
