@@ -1,13 +1,13 @@
 .icon {
-  align-items: center;
-  display: flex;
+	align-items: center;
+	display: flex;
 }
 
 .content {
-  overflow: hidden !important;
-  max-width: 100vw;
+	max-width: 100vw;
+	overflow: hidden !important;
 }
 
 .mobileHeader > div {
-  z-index: 1000;
+	z-index: 1000;
 }

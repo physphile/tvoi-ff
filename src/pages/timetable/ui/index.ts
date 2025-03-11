@@ -1,1 +1,1 @@
-export { GroupsTable } from "../groups/ui/GroupsTable";
+export { GroupsTable } from '../groups/ui/GroupsTable';

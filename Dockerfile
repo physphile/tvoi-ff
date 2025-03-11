@@ -1,4 +1,14 @@
-FROM nginxinc/nginx-unprivileged
-EXPOSE 8080
-COPY ./docker/nginx/conf.d/default.conf /etc/nginx/conf.d/default.conf
-COPY ./index.html /usr/share/nginx/html/index.html
+FROM oven/bun:alpine as builder
+WORKDIR /app
+COPY package*.json .
+RUN bun install --frozen-lockfile
+COPY . .
+RUN bun run build
+
+FROM caddy:2-alpine
+COPY --from=builder /app/dist /usr/share/caddy
+COPY Caddyfile /etc/caddy/Caddyfile
+
+EXPOSE 80
+EXPOSE 443
+CMD ["caddy", "run", "--config", "/etc/caddy/Caddyfile"]

@@ -1,6 +1,6 @@
 import { ActionBar } from '@gravity-ui/navigation';
 import { Breadcrumbs, Flex, Skeleton, spacing } from '@gravity-ui/uikit';
-import { useMemo, type ReactNode } from 'react';
+import { type ReactNode, useMemo } from 'react';
 import { useNavigate } from 'react-router';
 
 export interface PageHeaderProps {

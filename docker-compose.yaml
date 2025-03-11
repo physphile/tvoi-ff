@@ -1,0 +1,22 @@
+services:
+  web:
+    image: cr.yandex/crpn9hemlidi718gq9es/tvoi-ff:latest
+    ports:
+      - 80:80
+      - 443:443
+    volumes:
+      - caddy_data:/data
+      - caddy_config:/config
+    restart: unless-stopped
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  caddy_data:
+    driver: local
+  caddy_config:
+    driver: local 

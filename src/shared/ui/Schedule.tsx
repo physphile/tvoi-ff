@@ -11,11 +11,11 @@ import {
 } from '@gravity-ui/uikit';
 import { Loader } from '@gravity-ui/uikit';
 import { type ReactNode, useCallback, useEffect, useMemo, useState } from 'react';
-import type { EventGet } from '../api/timetable';
-import { getEventsWithIntersections, findLcm } from '../helpers';
-import { EventCard } from './EventCard';
-import { assignOrders } from '../helpers/assignOrders';
 import { useMediaQuery } from 'usehooks-ts';
+import type { EventGet } from '../api/timetable';
+import { findLcm, getEventsWithIntersections } from '../helpers';
+import { assignOrders } from '../helpers/assignOrders';
+import { EventCard } from './EventCard';
 
 export interface ScheduleProps {
 	events: EventGet[];

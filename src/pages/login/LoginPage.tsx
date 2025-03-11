@@ -2,6 +2,7 @@ import { AuthButton } from '@/features/AuthButton';
 import { AUTH_METHODS_LIST, AUTH_METHODS_MAP } from '@/features/lib';
 import type { AuthBackendAuthMethodSessionSession } from '@/shared/api/auth';
 import { capitalize } from '@/shared/helpers/capitalize';
+import { PageHeader } from '@/shared/ui';
 import { Flex, useToaster } from '@gravity-ui/uikit';
 import { useMount } from 'ahooks';
 import { useMemo } from 'react';
@@ -9,7 +10,6 @@ import { useNavigate, useSearchParams } from 'react-router';
 import { useLocalStorage } from 'usehooks-ts';
 import { isAuthMethod } from './helpers';
 import { EmailLoginForm } from './ui';
-import { PageHeader } from '@/shared/ui';
 
 export const LoginPage = () => {
 	const [searchParams, setSearchParams] = useSearchParams();

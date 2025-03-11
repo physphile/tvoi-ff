@@ -1,0 +1,95 @@
+name: CI/CD Pipeline
+
+on:
+  release:
+    types: [published]
+
+env:
+  REGISTRY: cr.yandex
+  REGISTRY_ID: crpn9hemlidi718gq9es
+  IMAGE_NAME: tvoi-ff
+  YC_FOLDER_ID: b1gcga4chs3ccko8d2os
+
+jobs:
+  code-quality:
+    name: Code Quality
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v1
+        with:
+          bun-version: latest
+
+      - name: Install dependencies
+        run: bun install
+
+      - name: Run TypeScript type check
+        run: bun run typecheck
+
+      - name: Run Biome
+        run: bun run biome
+
+      - name: Run Stylelint
+        run: bun run stylelint
+
+      - name: Check circular dependencies
+        run: bun run dpdm
+
+  build-and-push:
+    name: Build and Push
+    needs: code-quality
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Login to Yandex Cloud Container Registry
+        id: login-cr
+        uses: yc-actions/yc-cr-login@v1
+        with:
+          yc-sa-json-credentials: ${{ secrets.YC_SERVICE_ACCOUNT_KEY }}
+
+      - name: Build and push Docker image
+        env:
+          CR_REGISTRY: ${{ env.REGISTRY_ID }}
+          CR_REPOSITORY: ${{ env.IMAGE_NAME }}
+          IMAGE_TAG: ${{ github.event.release.tag_name }}
+        run: |
+          docker build -t ${{ env.REGISTRY }}/$CR_REGISTRY/$CR_REPOSITORY:$IMAGE_TAG .
+          docker build -t ${{ env.REGISTRY }}/$CR_REGISTRY/$CR_REPOSITORY:latest .
+          docker push ${{ env.REGISTRY }}/$CR_REGISTRY/$CR_REPOSITORY:$IMAGE_TAG
+          docker push ${{ env.REGISTRY }}/$CR_REGISTRY/$CR_REPOSITORY:latest
+
+  deploy:
+    name: Deploy
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Deploy to COI VM
+        id: deploy-coi
+        uses: yc-actions/yc-coi-deploy@v2
+        env:
+          CR_REGISTRY: ${{ env.REGISTRY_ID }}
+          CR_REPOSITORY: ${{ env.IMAGE_NAME }}
+          IMAGE_TAG: ${{ github.event.release.tag_name }}
+        with:
+          yc-sa-json-credentials: ${{ secrets.YC_SERVICE_ACCOUNT_KEY }}
+          folder-id: ${{ env.YC_FOLDER_ID }}
+          vm-name: tvoi-ff
+          vm-service-account-name: tvoi-ff
+          vm-subnet-id: e2lo1g596rle1101o5ct
+          user-data-path: "./user-data.yaml"
+          docker-compose-path: "./docker-compose.yaml"
+          vm-zone-id: ru-central1-b
+          vm-cores: 2
+          vm-memory: 2GB
+          vm-core-fraction: 100
+          vm-disk-type: network-ssd
+          vm-disk-size: 15GB
+          vm-public-ip: 158.160.94.224
