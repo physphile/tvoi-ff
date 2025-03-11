@@ -87,3 +87,8 @@ jobs:
           user-data-path: "./user-data.yaml"
           docker-compose-path: "./docker-compose.yaml"
           vm-zone-id: ru-central1-b
+          vm-cores: 2
+          vm-memory: 2GB
+          vm-core-fraction: 100
+          vm-disk-type: network-ssd
+          vm-disk-size: 15GB
