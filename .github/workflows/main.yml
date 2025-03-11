@@ -20,6 +20,10 @@ jobs:
       - name: Install YC CLI
         run: |
           curl -sSL https://storage.yandexcloud.net/yandexcloud-yc/install.sh | bash
+          source "/home/runner/.bashrc"
+
+      - name: Configure YC CLI
+        run: |
           echo "${{ secrets.YC_SERVICE_ACCOUNT_KEY }}" > key.json
           yc config profile create sa-profile
           yc config set service-account-key key.json
@@ -57,12 +61,23 @@ jobs:
           key: ${{ secrets.SERVER_SSH_KEY }}
           script: |
             cd /path/to/your/app
+            
+            # Install YC CLI
+            curl -sSL https://storage.yandexcloud.net/yandexcloud-yc/install.sh | bash
+            source ~/.bashrc
+            
+            # Configure YC CLI
             echo "${{ secrets.YC_SERVICE_ACCOUNT_KEY }}" > key.json
             yc config profile create sa-profile
             yc config set service-account-key key.json
             yc config set folder-id ${{ env.YC_FOLDER_ID }}
+            
+            # Configure Docker and deploy
             yc container registry configure-docker
             docker pull ${{ env.REGISTRY }}/${{ env.REGISTRY_ID }}/${{ env.IMAGE_NAME }}:${{ github.event.release.tag_name }}
             docker-compose down
             docker-compose up -d
             docker logout ${{ env.REGISTRY }}/${{ env.REGISTRY_ID }}
+            
+            # Cleanup
+            rm -f key.json
