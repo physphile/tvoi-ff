@@ -17,67 +17,40 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Install YC CLI
-        run: |
-          curl -sSL https://storage.yandexcloud.net/yandexcloud-yc/install.sh | bash
-          source "/home/runner/.bashrc"
-
-      - name: Configure YC CLI
-        run: |
-          echo "${{ secrets.YC_SERVICE_ACCOUNT_KEY }}" > key.json
-          yc config profile create sa-profile
-          yc config set service-account-key key.json
-          yc config set folder-id ${{ env.YC_FOLDER_ID }}
-          yc config set format json
-
-      - name: Login to Yandex Container Registry
-        run: |
-          yc container registry configure-docker
+      - name: Login to Yandex Cloud Container Registry
+        id: login-cr
+        uses: yc-actions/yc-cr-login@v1
+        with:
+          yc-sa-json-credentials: ${{ secrets.YC_SERVICE_ACCOUNT_KEY }}
 
       - name: Build and push Docker image
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          push: true
-          platforms: linux/amd64
-          tags: |
-            ${{ env.REGISTRY }}/${{ env.REGISTRY_ID }}/${{ env.IMAGE_NAME }}:${{ github.event.release.tag_name }}
-            ${{ env.REGISTRY }}/${{ env.REGISTRY_ID }}/${{ env.IMAGE_NAME }}:latest
-
-      - name: Logout from registry
-        if: always()
+        env:
+          CR_REGISTRY: ${{ env.REGISTRY_ID }}
+          CR_REPOSITORY: ${{ env.IMAGE_NAME }}
+          IMAGE_TAG: ${{ github.event.release.tag_name }}
         run: |
-          docker logout ${{ env.REGISTRY }}/${{ env.REGISTRY_ID }}
+          docker build -t ${{ env.REGISTRY }}/$CR_REGISTRY/$CR_REPOSITORY:$IMAGE_TAG .
+          docker build -t ${{ env.REGISTRY }}/$CR_REGISTRY/$CR_REPOSITORY:latest .
+          docker push ${{ env.REGISTRY }}/$CR_REGISTRY/$CR_REPOSITORY:$IMAGE_TAG
+          docker push ${{ env.REGISTRY }}/$CR_REGISTRY/$CR_REPOSITORY:latest
 
   deploy:
     needs: build-and-push
     runs-on: ubuntu-latest
     steps:
-      - name: Deploy to server
-        uses: appleboy/ssh-action@v1.0.3
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Deploy to COI VM
+        id: deploy-coi
+        uses: yc-actions/yc-coi-deploy@v2
+        env:
+          CR_REGISTRY: ${{ env.REGISTRY_ID }}
+          CR_REPOSITORY: ${{ env.IMAGE_NAME }}
+          IMAGE_TAG: ${{ github.event.release.tag_name }}
         with:
-          host: ${{ secrets.SERVER_HOST }}
-          username: ${{ secrets.SERVER_USERNAME }}
-          key: ${{ secrets.SERVER_SSH_KEY }}
-          script: |
-            cd /path/to/your/app
-            
-            # Install YC CLI
-            curl -sSL https://storage.yandexcloud.net/yandexcloud-yc/install.sh | bash
-            source ~/.bashrc
-            
-            # Configure YC CLI
-            echo "${{ secrets.YC_SERVICE_ACCOUNT_KEY }}" > key.json
-            yc config profile create sa-profile
-            yc config set service-account-key key.json
-            yc config set folder-id ${{ env.YC_FOLDER_ID }}
-            
-            # Configure Docker and deploy
-            yc container registry configure-docker
-            docker pull ${{ env.REGISTRY }}/${{ env.REGISTRY_ID }}/${{ env.IMAGE_NAME }}:${{ github.event.release.tag_name }}
-            docker-compose down
-            docker-compose up -d
-            docker logout ${{ env.REGISTRY }}/${{ env.REGISTRY_ID }}
-            
-            # Cleanup
-            rm -f key.json
+          yc-sa-json-credentials: ${{ secrets.YC_SERVICE_ACCOUNT_KEY }}
+          folder-id: ${{ env.YC_FOLDER_ID }}
+          vm-name: tvoi-ff
+          vm-service-account-id: tvoi-ff
+          docker-compose-path: './docker-compose.yaml'
