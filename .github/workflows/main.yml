@@ -82,7 +82,8 @@ jobs:
           yc-sa-json-credentials: ${{ secrets.YC_SERVICE_ACCOUNT_KEY }}
           folder-id: ${{ env.YC_FOLDER_ID }}
           vm-name: tvoi-ff
-          vm-service-account-name: tvoi-ff
+          vm-service-account-id: aje1fjugln9rmgtsp0ir
           vm-subnet-id: default1-ru-central1-b
           user-data-path: "./user-data.yaml"
           docker-compose-path: "./docker-compose.yaml"
+          vm-zone-id: ru-central1-b
