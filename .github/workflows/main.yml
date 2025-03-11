@@ -8,7 +8,7 @@ env:
   REGISTRY: cr.yandex
   REGISTRY_ID: crpn9hemlidi718gq9es
   IMAGE_NAME: tvoi-ff
-  YC_FOLDER_ID: sourcecraft
+  YC_FOLDER_ID: b1gcga4chs3ccko8d2os
 
 jobs:
   code-quality:
