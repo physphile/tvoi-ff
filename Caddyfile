@@ -1,0 +1,26 @@
+{
+    # Включаем автоматическое получение SSL-сертификатов
+    email cobal2m@gmail.com
+}
+
+tvoi-ff.ru {
+    root * /usr/share/caddy
+    try_files {path} /index.html
+    file_server
+    encode gzip
+    header {
+        # Разрешаем CORS
+        Access-Control-Allow-Origin *
+        # Включаем security headers
+        Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
+        X-Content-Type-Options "nosniff"
+        X-Frame-Options "DENY"
+        Referrer-Policy "no-referrer-when-downgrade"
+        Content-Security-Policy "upgrade-insecure-requests"
+    }
+}
+
+# Редирект с www на non-www версию
+www.tvoi-ff.ru {
+    redir https://tvoi-ff.ru{uri} permanent
+} 

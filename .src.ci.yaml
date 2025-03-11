@@ -1,27 +1,14 @@
-# Для работы данного CI/CD вам необходимо создать следующие ресурсы в Yandex Cloud:
-# - Container Registry
-# - Serverless Container
-# - Service Account
-# Также необходимо создать секретный ключ для доступа к Container Registry и Service Account
-
 on:
-  #push:
-  #  - workflows: ci-cd-container-registry-serverless
-  #    filter:
-  #      branches: ["main"]
-  pull_request:
-    - workflows: ci-cd-container-registry-serverless
-      filter:
-        source_branches: ["**", "!test**"]
-        target_branches: "main"
+  release:
+    - workflows: ci-cd-registry
 
 workflows:
-  ci-cd-container-registry-serverless:
+  ci-cd-registry:
     tasks:
-      - build-push-deploy-serverless
+      - build-push-registry
 
 tasks:
-  - name: build-push-deploy-serverless
+  - name: build-push-registry
     env:
       YC_DOCKER_REGISTRY_URI: cr.yandex/crpn9hemlidi718gq9es
       IMAGE_NAME: tvoi-ff
@@ -53,7 +40,3 @@ tasks:
       - name: docker-logout
         script:
           - docker logout $YC_DOCKER_REGISTRY_URI
-
-      - name: create-serverless
-        script:
-          - yc serverless container revision deploy  --container-name $YC_SERVERLESS_CONTAINER_NAME --image $YC_DOCKER_REGISTRY_URI/$IMAGE_NAME:latest --service-account-id $YC_SERVICE_ACCOUNT_ID
