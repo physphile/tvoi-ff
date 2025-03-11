@@ -1,8 +1,6 @@
 services:
   web:
-    build:
-      context: .
-      dockerfile: Dockerfile
+    image: cr.yandex/crpn9hemlidi718gq9es/tvoi-ff:latest
     ports:
       - "80:80"
       - "443:443"
