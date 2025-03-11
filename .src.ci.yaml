@@ -1,7 +1,3 @@
-on:
-  release:
-    - workflows: ci-cd-registry
-
 workflows:
   ci-cd-registry:
     tasks:
