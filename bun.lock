@@ -23,6 +23,7 @@
       "devDependencies": {
         "@bem-react/classname": "1.6.0",
         "@biomejs/biome": "1.9.4",
+        "@biomejs/cli-linux-x64": "^1.9.4",
         "@chromatic-com/storybook": "^3.2.5",
         "@gravity-ui/components": "^4.0.1",
         "@gravity-ui/icons": "^2.13.0",
@@ -104,6 +105,8 @@
     "@biomejs/biome": ["@biomejs/biome@1.9.4", "", { "optionalDependencies": { "@biomejs/cli-darwin-arm64": "1.9.4" }, "bin": { "biome": "bin/biome" } }, ""],
 
     "@biomejs/cli-darwin-arm64": ["@biomejs/cli-darwin-arm64@1.9.4", "", { "os": "darwin", "cpu": "arm64" }, ""],
+
+    "@biomejs/cli-linux-x64": ["@biomejs/cli-linux-x64@1.9.4", "", { "os": "linux", "cpu": "x64" }, "sha512-lRCJv/Vi3Vlwmbd6K+oQ0KhLHMAysN8lXoCI7XeHlxaajk06u7G+UsFSO01NAs5iYuWKmVZjmiOzJ0OJmGsMwg=="],
 
     "@bufbuild/protobuf": ["@bufbuild/protobuf@2.2.3", "", {}, "sha512-tFQoXHJdkEOSwj5tRIZSPNUuXK3RaR7T1nUrPgbYX1pUbvqqaaZAsfo+NXBPsz5rZMSKVFrgK1WL8Q/MSLvprg=="],
 

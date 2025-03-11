@@ -39,6 +39,7 @@
 	"devDependencies": {
 		"@bem-react/classname": "1.6.0",
 		"@biomejs/biome": "1.9.4",
+		"@biomejs/cli-linux-x64": "^1.9.4",
 		"@chromatic-com/storybook": "^3.2.5",
 		"@gravity-ui/components": "^4.0.1",
 		"@gravity-ui/icons": "^2.13.0",
