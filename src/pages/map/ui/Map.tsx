@@ -1,5 +1,12 @@
+import {
+	getEventsEventGetOptions,
+	getRoomsRoomGetOptions,
+} from '@/shared/api/timetable/@tanstack/react-query.gen';
+import { dateTime } from '@gravity-ui/date-utils';
 import { Minus, Plus } from '@gravity-ui/icons';
+import XmarkIcon from '@gravity-ui/icons/svgs/xmark.svg';
 import { Button, Card, Flex, Icon } from '@gravity-ui/uikit';
+import { useQuery } from '@tanstack/react-query';
 import Konva from 'konva';
 import { Fragment, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Image, Layer, Rect, Stage, Text } from 'react-konva';
@@ -7,13 +14,6 @@ import { useNavigate, useParams } from 'react-router';
 import useImage from 'use-image';
 import { useResizeObserver } from 'usehooks-ts';
 import { cursorPointer, floors } from '../constants';
-import { useQuery } from '@tanstack/react-query';
-import {
-	getEventsEventGetOptions,
-	getRoomsRoomGetOptions,
-} from '@/shared/api/timetable/@tanstack/react-query.gen';
-import { dateTime } from '@gravity-ui/date-utils';
-import XmarkIcon from '@gravity-ui/icons/svgs/xmark.svg';
 
 const POPOVER_EVENTS_GAP = 4;
 const POPOVER_PADDING_X = 4;

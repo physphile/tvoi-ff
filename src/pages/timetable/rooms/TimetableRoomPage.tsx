@@ -1,8 +1,8 @@
-import { Container, PageHeader } from '@/shared/ui';
-import { useParams } from 'react-router';
-import { useQuery } from '@tanstack/react-query';
 import { getRoomByIdRoomIdGetOptions } from '@/shared/api/timetable/@tanstack/react-query.gen';
+import { Container, PageHeader } from '@/shared/ui';
 import { TimetableSchedule } from '@/widgets/timetable';
+import { useQuery } from '@tanstack/react-query';
+import { useParams } from 'react-router';
 
 export const TimetableRoomPage = () => {
 	const params = useParams();

@@ -1,9 +1,9 @@
 import { getGroupByIdGroupIdGetOptions } from '@/shared/api/timetable/@tanstack/react-query.gen';
 import { Container, PageHeader } from '@/shared/ui';
+import { TimetableSchedule } from '@/widgets/timetable';
 import { Flex, Text, spacing } from '@gravity-ui/uikit';
 import { useQuery } from '@tanstack/react-query';
 import { useParams } from 'react-router';
-import { TimetableSchedule } from '@/widgets/timetable';
 export const TimetableGroupPage = () => {
 	const params = useParams();
 	const groupId = Number(params.groupId);

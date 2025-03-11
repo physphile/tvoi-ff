@@ -1,1 +1,1 @@
-export { TimetableLecturerPage } from "./TimetableLecturerPage";
+export { TimetableLecturerPage } from './TimetableLecturerPage';
