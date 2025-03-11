@@ -30,7 +30,7 @@ export const router = createBrowserRouter(
 					return redirect(`/login?${url.searchParams.toString()}`);
 				}}
 			/>
-			<Route path="" element={<HomePage />} />
+			<Route path="" element={<HomePage />} loader={() => redirect('/timetable/groups')} />
 
 			<Route
 				path="login"
