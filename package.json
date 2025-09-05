@@ -21,12 +21,12 @@
 	},
 	"dependencies": {
 		"@gravity-ui/date-utils": "^2.5.6",
-		"@gravity-ui/navigation": "^3.1.4",
+		"@gravity-ui/navigation": "^3.3.0",
 		"@gravity-ui/table": "^1.9.0",
 		"@hey-api/client-fetch": "^0.8.3",
-		"@tanstack/react-query": "^5.67.2",
+		"@tanstack/react-query": "^5.67.3",
 		"ahooks": "^3.8.4",
-		"konva": "^9.3.18",
+		"konva": "^9.3.19",
 		"react": "^19.0.0",
 		"react-dom": "^19.0.0",
 		"react-error-boundary": "^5.0.0",
@@ -45,7 +45,7 @@
 		"@gravity-ui/icons": "^2.13.0",
 		"@gravity-ui/illustrations": "^2.1.0",
 		"@gravity-ui/uikit": "^7.5.1",
-		"@hey-api/openapi-ts": "^0.64.10",
+		"@hey-api/openapi-ts": "^0.64.12",
 		"@playwright/experimental-ct-react": "^1.51.0",
 		"@playwright/test": "^1.51.0",
 		"@storybook/addon-essentials": "^8.6.4",
@@ -60,7 +60,7 @@
 		"@types/react-dom": "^19.0.4",
 		"@vitejs/plugin-react-swc": "^3.8.0",
 		"dpdm": "^3.14.0",
-		"knip": "^5.45.0",
+		"knip": "^5.46.0",
 		"sass-embedded": "^1.85.1",
 		"storybook": "^8.6.4",
 		"storybook-dark-mode": "^4.0.2",
@@ -68,8 +68,8 @@
 		"stylelint-config-recommended": "^15.0.0",
 		"stylelint-order": "^6.0.4",
 		"typescript": "^5.8.2",
-		"vite": "^6.2.1",
-		"vite-plugin-mkcert": "^1.17.7"
+		"vite": "^6.2.2",
+		"vite-plugin-mkcert": "^1.17.8"
 	},
 	"module": "index.ts"
 }

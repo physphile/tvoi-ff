@@ -27,8 +27,7 @@ export const LecturerComment = ({
 					</Text>
 					<Text
 						color={getTextNumberColor(mark_general)}
-						variant="subheader-2"
-						style={{ justifySelf: 'flex-end' }}
+						style={{ justifySelf: 'flex-end', fontWeight: 700 }}
 					>
 						{formatNumber(mark_general)}
 					</Text>
