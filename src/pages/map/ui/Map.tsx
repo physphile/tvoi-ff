@@ -1,19 +1,18 @@
-import {
-	getEventsEventGetOptions,
-	getRoomsRoomGetOptions,
-} from '@/shared/api/timetable/@tanstack/react-query.gen';
-import { dateTime } from '@gravity-ui/date-utils';
-import { Minus, Plus } from '@gravity-ui/icons';
-import XmarkIcon from '@gravity-ui/icons/svgs/xmark.svg';
-import { Button, Card, Flex, Icon } from '@gravity-ui/uikit';
-import { useQuery } from '@tanstack/react-query';
-import Konva from 'konva';
-import { Fragment, useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Image, Layer, Rect, Stage, Text } from 'react-konva';
-import { useNavigate, useParams } from 'react-router';
-import useImage from 'use-image';
-import { useResizeObserver } from 'usehooks-ts';
-import { cursorPointer, floors } from '../constants';
+import { dateTime } from "@gravity-ui/date-utils";
+import { Minus, Plus } from "@gravity-ui/icons";
+import XmarkIcon from "@gravity-ui/icons/svgs/xmark.svg";
+import { Button, Card, Flex, Icon } from "@gravity-ui/uikit";
+import { useQuery } from "@tanstack/react-query";
+import Konva from "konva";
+import { Fragment, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { Image, Layer, Rect, Stage, Text } from "react-konva";
+import { useNavigate, useParams } from "react-router";
+import useImage from "use-image";
+import { useResizeObserver } from "usehooks-ts";
+
+import { getEventsEventGetOptions, getRoomsRoomGetOptions } from "@/shared/api/timetable/@tanstack/react-query.gen";
+
+import { cursorPointer, floors } from "../constants";
 
 const POPOVER_EVENTS_GAP = 4;
 const POPOVER_PADDING_X = 4;
@@ -43,7 +42,7 @@ const getCenter = (p1: Point, p2: Point) => {
 };
 
 const getDistance = (p1: Point, p2: Point) => {
-	return Math.sqrt((p2.x - p1.x) ** 2 + (p2.y - p1.y) ** 2);
+	return Math.hypot(p2.x - p1.x, p2.y - p1.y);
 };
 
 export const MapComponent = () => {
@@ -55,10 +54,7 @@ export const MapComponent = () => {
 	const params = useParams();
 	const floor = Number(params.floor);
 	const roomName = params.roomName;
-	const selectedRoom = useMemo(
-		() => floors[floor].find(room => room.name === roomName),
-		[floor, roomName]
-	);
+	const selectedRoom = useMemo(() => floors[floor].find(room => room.name === roomName), [floor, roomName]);
 
 	const { data: roomData } = useQuery({
 		...getRoomsRoomGetOptions({ query: { limit: 1, query: roomName } }),
@@ -70,9 +66,9 @@ export const MapComponent = () => {
 	const { data: eventsData, isLoading: isEventsLoading } = useQuery({
 		...getEventsEventGetOptions({
 			query: {
+				end: dateTime().add(2, "day").format("YYYY-MM-DD"),
 				room_id: roomId,
-				start: dateTime().add(1, 'day').format('YYYY-MM-DD'),
-				end: dateTime().add(2, 'day').format('YYYY-MM-DD'),
+				start: dateTime().add(1, "day").format("YYYY-MM-DD"),
 			},
 		}),
 		enabled: Boolean(roomId),
@@ -89,12 +85,12 @@ export const MapComponent = () => {
 	const [image] = useImage(`/map/floor${floor}.webp`);
 
 	const { width = 0 } = useResizeObserver({
-		// @ts-expect-error
+		box: "border-box",
+		// @ts-expect-error - ref is not typed
 		ref,
-		box: 'border-box',
 	});
 
-	const [lastCenter, setLastCenter] = useState<Point | null>(null);
+	const [lastCenter, setLastCenter] = useState<Point | undefined>(undefined);
 	const [lastDist, setLastDist] = useState(0);
 	const [dragStopped, setDragStopped] = useState(false);
 	const [scale, setScale] = useState(2);
@@ -170,29 +166,29 @@ export const MapComponent = () => {
 	);
 
 	return (
-		<Card ref={ref} style={{ position: 'relative' }}>
+		<Card ref={ref} style={{ position: "relative" }}>
 			<Stage
-				scale={{ x: scale, y: scale }}
-				width={width}
+				draggable
 				height={500}
-				ref={stageRef}
-				onTouchMove={pinch}
 				onTouchEnd={() => {
 					setLastDist(0);
-					setLastCenter(null);
+					setLastCenter(undefined);
 				}}
-				draggable
+				onTouchMove={pinch}
+				ref={stageRef}
+				scale={{ x: scale, y: scale }}
+				width={width}
 			>
 				<Layer>
-					<Image image={image} width={480.52} height={239.29} />
+					<Image height={239.29} image={image} width={480.52} />
 				</Layer>
 				<Layer>
 					{floors[floor].map(room => (
 						<Rect
 							{...cursorPointer}
+							fill={room.name === roomName ? "#ec9a0050" : undefined}
+							stroke={room.name === roomName ? "#ec9a00" : "#759bff"}
 							strokeWidth={1}
-							fill={room.name === roomName ? '#ec9a0050' : undefined}
-							stroke={room.name === roomName ? '#ec9a00' : '#759bff'}
 							{...room}
 							key={room.name}
 							onPointerClick={() => {
@@ -205,10 +201,8 @@ export const MapComponent = () => {
 					{selectedRoom && (
 						<>
 							<Rect
-								x={selectedRoom.x + selectedRoom.width + POPOVER_OFFSET_X}
-								y={selectedRoom.y + selectedRoom.height}
+								cornerRadius={8}
 								fill="white"
-								width={POPOVER_WIDTH}
 								height={Math.max(
 									POPOVER_PADDING_TOP +
 										POPOVER_TITLE_FONT_SIZE +
@@ -218,73 +212,65 @@ export const MapComponent = () => {
 										POPOVER_PADDING_BOTTOM,
 									POPOVER_MIN_HEIGHT
 								)}
-								shadowOffsetX={0}
-								shadowOffsetY={1}
 								shadowBlur={5}
 								shadowColor="black"
+								shadowOffsetX={0}
+								shadowOffsetY={1}
 								shadowOpacity={0.15}
-								cornerRadius={8}
+								width={POPOVER_WIDTH}
+								x={selectedRoom.x + selectedRoom.width + POPOVER_OFFSET_X}
+								y={selectedRoom.y + selectedRoom.height}
 							/>
 							<Rect
+								cornerRadius={2}
 								fill="white"
-								width={12}
 								height={12}
-								strokeWidth={0.5}
-								stroke="#0000001a"
 								onPointerClick={() => navigate(`/map/${floor}`)}
 								onPointerEnter={e => {
 									const container = e.target.getStage()?.container();
 									if (container) {
-										container.style.cursor = 'pointer';
+										container.style.cursor = "pointer";
 									}
-									e.target.to({ stroke: '#759bff', duration: 0.1, strokeWidth: 1 });
+									e.target.to({ duration: 0.1, stroke: "#759bff", strokeWidth: 1 });
 								}}
 								onPointerLeave={e => {
-									e.target.to({ stroke: '#0000001a', duration: 0.1, strokeWidth: 0.5 });
+									e.target.to({ duration: 0.1, stroke: "#0000001a", strokeWidth: 0.5 });
 									const container = e.target.getStage()?.container();
 									if (container) {
-										container.style.cursor = 'default';
+										container.style.cursor = "default";
 									}
 								}}
-								cornerRadius={2}
-								x={
-									selectedRoom.x +
-									selectedRoom.width +
-									POPOVER_OFFSET_X +
-									POPOVER_WIDTH -
-									12 -
-									POPOVER_PADDING_X
-								}
+								stroke="#0000001a"
+								strokeWidth={0.5}
+								width={12}
+								x={selectedRoom.x + selectedRoom.width + POPOVER_OFFSET_X + POPOVER_WIDTH - 12 - POPOVER_PADDING_X}
 								y={selectedRoom.y + selectedRoom.height + POPOVER_PADDING_TOP - 3}
 							/>
 							<Image
-								image={xmark}
-								width={12}
 								height={12}
-								opacity={0.5}
-								x={
-									selectedRoom.x +
-									selectedRoom.width +
-									POPOVER_OFFSET_X +
-									POPOVER_WIDTH -
-									12 -
-									POPOVER_PADDING_X
-								}
-								y={selectedRoom.y + selectedRoom.height + POPOVER_PADDING_TOP - 3}
+								image={xmark}
 								listening={false}
+								opacity={0.5}
+								width={12}
+								x={selectedRoom.x + selectedRoom.width + POPOVER_OFFSET_X + POPOVER_WIDTH - 12 - POPOVER_PADDING_X}
+								y={selectedRoom.y + selectedRoom.height + POPOVER_PADDING_TOP - 3}
 							/>
 							<Text
+								fill="black"
+								fontFamily="Inter"
+								fontSize={POPOVER_TITLE_FONT_SIZE}
+								fontWeight="bold"
+								height={POPOVER_TITLE_FONT_SIZE}
+								text={selectedRoom.name}
 								x={selectedRoom.x + selectedRoom.width + POPOVER_PADDING_X + POPOVER_OFFSET_X}
 								y={selectedRoom.y + selectedRoom.height + POPOVER_PADDING_TOP}
-								text={selectedRoom.name}
-								fontSize={POPOVER_TITLE_FONT_SIZE}
-								height={POPOVER_TITLE_FONT_SIZE}
-								fontFamily="Inter"
-								fontWeight="bold"
-								fill="black"
 							/>
 							{isEventsLoading ? (
 								<Text
+									fill="black"
+									fontFamily="Inter"
+									fontSize={6}
+									text="Загрузка..."
 									x={selectedRoom.x + selectedRoom.width + POPOVER_PADDING_X + POPOVER_OFFSET_X}
 									y={
 										selectedRoom.y +
@@ -293,15 +279,34 @@ export const MapComponent = () => {
 										POPOVER_TITLE_FONT_SIZE +
 										POPOVER_TITLE_MARGIN
 									}
-									text="Загрузка..."
-									fontSize={6}
-									fontFamily="Inter"
-									fill="black"
 								/>
-							) : events.length > 0 ? (
+							) : // eslint-disable-next-line unicorn/no-nested-ternary
+							events.length > 0 ? (
 								events.map((event, index) => (
 									<Fragment key={event.id}>
 										<Rect
+											cornerRadius={4}
+											height={POPOVER_EVENT_HEIGHT}
+											onPointerClick={() => {
+												navigate(`/timetable/events/${event.id}`);
+											}}
+											onPointerEnter={e => {
+												const container = e.target.getStage()?.container();
+												if (container) {
+													container.style.cursor = "pointer";
+												}
+												e.target.to({ duration: 0.1, stroke: "#759bff", strokeWidth: 1 });
+											}}
+											onPointerLeave={e => {
+												e.target.to({ duration: 0.1, stroke: "#0000001a", strokeWidth: 0.5 });
+												const container = e.target.getStage()?.container();
+												if (container) {
+													container.style.cursor = "default";
+												}
+											}}
+											stroke="#0000001a"
+											strokeWidth={0.5}
+											width={POPOVER_WIDTH - POPOVER_PADDING_X * 2}
 											x={selectedRoom.x + selectedRoom.width + POPOVER_PADDING_X + POPOVER_OFFSET_X}
 											y={
 												selectedRoom.y +
@@ -311,30 +316,15 @@ export const MapComponent = () => {
 												POPOVER_TITLE_MARGIN +
 												index * (POPOVER_EVENT_HEIGHT + POPOVER_EVENTS_GAP)
 											}
-											width={POPOVER_WIDTH - POPOVER_PADDING_X * 2}
-											height={POPOVER_EVENT_HEIGHT}
-											stroke="#0000001a"
-											strokeWidth={0.5}
-											cornerRadius={4}
-											onPointerEnter={e => {
-												const container = e.target.getStage()?.container();
-												if (container) {
-													container.style.cursor = 'pointer';
-												}
-												e.target.to({ stroke: '#759bff', duration: 0.1, strokeWidth: 1 });
-											}}
-											onPointerLeave={e => {
-												e.target.to({ stroke: '#0000001a', duration: 0.1, strokeWidth: 0.5 });
-												const container = e.target.getStage()?.container();
-												if (container) {
-													container.style.cursor = 'default';
-												}
-											}}
-											onPointerClick={() => {
-												navigate(`/timetable/events/${event.id}`);
-											}}
 										/>
 										<Text
+											fill="black"
+											fontFamily="Inter"
+											fontSize={POPOVER_EVENT_FONT_SIZE}
+											fontWeight={700}
+											listening={false}
+											text={`${dateTime({ input: event.start_ts }).format("HH:mm")} ${event.name}`}
+											width={POPOVER_WIDTH - (POPOVER_PADDING_X + POPOVER_EVENT_PADDING) * 2}
 											x={
 												selectedRoom.x +
 												selectedRoom.width +
@@ -351,18 +341,16 @@ export const MapComponent = () => {
 												POPOVER_EVENT_PADDING +
 												index * (POPOVER_EVENT_HEIGHT + POPOVER_EVENTS_GAP)
 											}
-											width={POPOVER_WIDTH - (POPOVER_PADDING_X + POPOVER_EVENT_PADDING) * 2}
-											text={`${dateTime({ input: event.start_ts }).format('HH:mm')} ${event.name}`}
-											fontSize={POPOVER_EVENT_FONT_SIZE}
-											fontFamily="Inter"
-											fontWeight={700}
-											fill="black"
-											listening={false}
 										/>
 									</Fragment>
 								))
 							) : (
 								<Text
+									fill="black"
+									fontFamily="Inter"
+									fontSize={6}
+									text="Сегодня нет пар"
+									width={POPOVER_WIDTH - POPOVER_PADDING_X * 2}
 									x={selectedRoom.x + selectedRoom.width + POPOVER_PADDING_X + POPOVER_OFFSET_X}
 									y={
 										selectedRoom.y +
@@ -371,11 +359,6 @@ export const MapComponent = () => {
 										POPOVER_TITLE_FONT_SIZE +
 										POPOVER_TITLE_MARGIN
 									}
-									width={POPOVER_WIDTH - POPOVER_PADDING_X * 2}
-									text="Сегодня нет пар"
-									fontSize={6}
-									fontFamily="Inter"
-									fill="black"
 								/>
 							)}
 						</>
@@ -386,27 +369,27 @@ export const MapComponent = () => {
 				direction="column"
 				gap={2}
 				style={{
-					position: 'absolute',
-					top: '50%',
+					position: "absolute",
 					right: 16,
-					transform: 'translateY(-50%)',
+					top: "50%",
+					transform: "translateY(-50%)",
 				}}
 			>
 				<Button
-					view="action"
-					size="xl"
 					onClick={() => {
 						setScale(scale * 1.125);
 					}}
+					size="xl"
+					view="action"
 				>
 					<Icon data={Plus} />
 				</Button>
 				<Button
-					view="action"
-					size="xl"
 					onClick={() => {
 						setScale(scale / 1.125);
 					}}
+					size="xl"
+					view="action"
 				>
 					<Icon data={Minus} />
 				</Button>

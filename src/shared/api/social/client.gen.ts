@@ -2,11 +2,12 @@
 
 import {
 	type Config,
-	type ClientOptions as DefaultClientOptions,
 	createClient,
 	createConfig,
-} from '@hey-api/client-fetch';
-import type { ClientOptions } from './types.gen';
+	type ClientOptions as DefaultClientOptions,
+} from "@hey-api/client-fetch";
+
+import type { ClientOptions } from "./types.gen";
 
 /**
  * The `createClientConfig()` function will be called on client initialization
@@ -22,6 +23,6 @@ export type CreateClientConfig<T extends DefaultClientOptions = ClientOptions> =
 
 export const client = createClient(
 	createConfig<ClientOptions>({
-		baseUrl: 'https://api.test.profcomff.com/social',
+		baseUrl: "https://api.test.profcomff.com/social",
 	})
 );

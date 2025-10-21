@@ -26,7 +26,7 @@ import {
 	registerTelegramRegistrationPost,
 	registerVkRegistrationPost,
 	registerYandexRegistrationPost,
-} from '@/shared/api/auth';
+} from "@/shared/api/auth";
 import {
 	authUrlAuthenticAuthUrlGetQueryKey,
 	authUrlGithubAuthUrlGetQueryKey,
@@ -37,62 +37,62 @@ import {
 	authUrlTelegramAuthUrlGetQueryKey,
 	authUrlVkAuthUrlGetQueryKey,
 	authUrlYandexAuthUrlGetQueryKey,
-} from '@/shared/api/auth/@tanstack/react-query.gen';
+} from "@/shared/api/auth/@tanstack/react-query.gen";
 
 export const AUTH_METHODS_MAP = Object.freeze({
-	google: {
-		login: loginGoogleLoginPost,
-		register: registerGoogleRegistrationPost,
-		getAuthUrl: authUrlGoogleAuthUrlGet,
-		getQueryKey: authUrlGoogleAuthUrlGetQueryKey,
-	},
 	authentic: {
-		login: loginAuthenticLoginPost,
-		register: registerAuthenticRegistrationPost,
 		getAuthUrl: authUrlAuthenticAuthUrlGet,
 		getQueryKey: authUrlAuthenticAuthUrlGetQueryKey,
+		login: loginAuthenticLoginPost,
+		register: registerAuthenticRegistrationPost,
 	},
 	github: {
-		login: loginGithubLoginPost,
-		register: registerGithubRegistrationPost,
 		getAuthUrl: authUrlGithubAuthUrlGet,
 		getQueryKey: authUrlGithubAuthUrlGetQueryKey,
+		login: loginGithubLoginPost,
+		register: registerGithubRegistrationPost,
 	},
-	'lk-msu': {
-		login: loginLkMsuLoginPost,
-		register: registerLkMsuRegistrationPost,
+	google: {
+		getAuthUrl: authUrlGoogleAuthUrlGet,
+		getQueryKey: authUrlGoogleAuthUrlGetQueryKey,
+		login: loginGoogleLoginPost,
+		register: registerGoogleRegistrationPost,
+	},
+	"lk-msu": {
 		getAuthUrl: authUrlLkMsuAuthUrlGet,
 		getQueryKey: authUrlLkMsuAuthUrlGetQueryKey,
+		login: loginLkMsuLoginPost,
+		register: registerLkMsuRegistrationPost,
 	},
-	yandex: {
-		login: loginYandexLoginPost,
-		register: registerYandexRegistrationPost,
-		getAuthUrl: authUrlYandexAuthUrlGet,
-		getQueryKey: authUrlYandexAuthUrlGetQueryKey,
-	},
-	'my-msu': {
-		login: loginMyMsuLoginPost,
-		register: registerMyMsuRegistrationPost,
+	"my-msu": {
 		getAuthUrl: authUrlMyMsuAuthUrlGet,
 		getQueryKey: authUrlMyMsuAuthUrlGetQueryKey,
+		login: loginMyMsuLoginPost,
+		register: registerMyMsuRegistrationPost,
 	},
-	'physics-msu': {
-		login: loginPhysicsMsuLoginPost,
-		register: registerPhysicsMsuRegistrationPost,
+	"physics-msu": {
 		getAuthUrl: authUrlPhysicsMsuAuthUrlGet,
 		getQueryKey: authUrlPhysicsMsuAuthUrlGetQueryKey,
+		login: loginPhysicsMsuLoginPost,
+		register: registerPhysicsMsuRegistrationPost,
 	},
 	telegram: {
-		login: loginTelegramLoginPost,
-		register: registerTelegramRegistrationPost,
 		getAuthUrl: authUrlTelegramAuthUrlGet,
 		getQueryKey: authUrlTelegramAuthUrlGetQueryKey,
+		login: loginTelegramLoginPost,
+		register: registerTelegramRegistrationPost,
 	},
 	vk: {
-		login: loginVkLoginPost,
-		register: registerVkRegistrationPost,
 		getAuthUrl: authUrlVkAuthUrlGet,
 		getQueryKey: authUrlVkAuthUrlGetQueryKey,
+		login: loginVkLoginPost,
+		register: registerVkRegistrationPost,
+	},
+	yandex: {
+		getAuthUrl: authUrlYandexAuthUrlGet,
+		getQueryKey: authUrlYandexAuthUrlGetQueryKey,
+		login: loginYandexLoginPost,
+		register: registerYandexRegistrationPost,
 	},
 });
 

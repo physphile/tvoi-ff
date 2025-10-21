@@ -1,22 +1,24 @@
-import { Container, PageHeader } from '@/shared/ui';
-import { Flex, TextInput } from '@gravity-ui/uikit';
-import { useState } from 'react';
-import { GroupsTable } from './ui';
+import { Flex, TextInput } from "@gravity-ui/uikit";
+import { useState } from "react";
+
+import { Container, PageHeader } from "@/shared/ui";
+
+import { GroupsTable } from "./ui";
 
 export const TimetableGroupsPage = () => {
-	const [search, setSearch] = useState('');
+	const [search, setSearch] = useState("");
 
 	return (
 		<>
 			<PageHeader
 				breadcrumbs={[
-					{ label: 'Расписание', href: '/timetable' },
-					{ label: 'Группы', href: '/timetable/groups' },
+					{ href: "/timetable", label: "Расписание" },
+					{ href: "/timetable/groups", label: "Группы" },
 				]}
 			/>
 			<Container>
-				<Flex direction={'column'} gap={3}>
-					<TextInput placeholder="Поиск группы" value={search} onUpdate={setSearch} />
+				<Flex direction={"column"} gap={3}>
+					<TextInput onUpdate={setSearch} placeholder="Поиск группы" value={search} />
 					<GroupsTable search={search} />
 				</Flex>
 			</Container>

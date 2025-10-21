@@ -1,39 +1,35 @@
-import { requestResetForgottenPasswordEmailResetPasswordRestorePostMutation } from '@/shared/api/auth/@tanstack/react-query.gen';
-import { Dialog, Flex, TextInput, useToaster } from '@gravity-ui/uikit';
-import { useMutation } from '@tanstack/react-query';
-import { useEffect, useState } from 'react';
+import { Dialog, Flex, TextInput, useToaster } from "@gravity-ui/uikit";
+import { useMutation } from "@tanstack/react-query";
+import { useEffect, useState } from "react";
 
-export interface ResetPasswordModalProps {
+import { requestResetForgottenPasswordEmailResetPasswordRestorePostMutation } from "@/shared/api/auth/@tanstack/react-query.gen";
+
+interface ResetPasswordModalProps {
 	email: string;
 	onClose: () => void;
 	open: boolean;
 }
 
-export const ResetPasswordModal = ({
-	open,
-	onClose,
-	email: initialEmail,
-}: ResetPasswordModalProps) => {
+export const ResetPasswordModal = ({ email: initialEmail, onClose, open }: ResetPasswordModalProps) => {
 	const toaster = useToaster();
 	const [email, setEmail] = useState(initialEmail);
 
 	const { mutate: requestResetPassword } = useMutation({
 		...requestResetForgottenPasswordEmailResetPasswordRestorePostMutation(),
+		onError: error => {
+			toaster.add({
+				content: error.detail && "ru" in error.detail ? (error.detail.ru as string) : "Неизвестная ошибка",
+				name: "request-reset-password-error",
+				theme: "danger",
+			});
+		},
 		onSuccess: data => {
 			onClose();
 			toaster.add({
-				name: 'request-reset-password',
 				autoHiding: false,
-				theme: 'utility',
 				content: `${data.ru}. Если сменили, можете войти`,
-			});
-		},
-		onError: error => {
-			toaster.add({
-				name: 'request-reset-password-error',
-				theme: 'danger',
-				content:
-					error.detail && 'ru' in error.detail ? (error.detail.ru as string) : 'Неизвестная ошибка',
+				name: "request-reset-password",
+				theme: "utility",
 			});
 		},
 	});
@@ -45,19 +41,19 @@ export const ResetPasswordModal = ({
 	}, [initialEmail, open]);
 
 	return (
-		<Dialog open={open} onClose={onClose} size="m">
+		<Dialog onClose={onClose} open={open} size="m">
 			<Dialog.Header caption="Восстановить пароль" />
 			<Dialog.Body>
-				<Flex gap={2} direction="column">
-					<TextInput label="Email" type="email" size="l" value={email} onUpdate={setEmail} />
+				<Flex direction="column" gap={2}>
+					<TextInput label="Email" onUpdate={setEmail} size="l" type="email" value={email} />
 				</Flex>
 			</Dialog.Body>
 			<Dialog.Footer
-				propsButtonApply={{ view: 'action' }}
+				onClickButtonApply={() => requestResetPassword({ body: { email } })}
+				onClickButtonCancel={onClose}
+				propsButtonApply={{ view: "action" }}
 				textButtonApply="Восстановить"
 				textButtonCancel="Отмена"
-				onClickButtonCancel={onClose}
-				onClickButtonApply={() => requestResetPassword({ body: { email } })}
 			/>
 		</Dialog>
 	);

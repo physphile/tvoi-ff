@@ -1,5 +1,5 @@
-import { getIsUnionMember } from './getIsUnionMember';
-import { getPrinterLoginData } from './getPrinterLoginData';
+import { getIsUnionMember } from "./getIsUnionMember";
+import { getPrinterLoginData } from "./getPrinterLoginData";
 
 export const checkPrinterAvailable = async () => {
 	const printerLoginData = await getPrinterLoginData();
@@ -8,13 +8,13 @@ export const checkPrinterAvailable = async () => {
 		return false;
 	}
 
-	const { surname, number } = printerLoginData;
+	const { number, surname } = printerLoginData;
 
 	if (!surname || !number) {
 		return false;
 	}
 
-	const isMember = await getIsUnionMember({ surname, number });
+	const isMember = await getIsUnionMember({ number, surname });
 
 	return isMember;
 };

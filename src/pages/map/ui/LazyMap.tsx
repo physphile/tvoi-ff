@@ -1,14 +1,14 @@
-import { Card, Flex, Loader } from '@gravity-ui/uikit';
-import { Suspense, lazy } from 'react';
+import { Card, Flex, Loader } from "@gravity-ui/uikit";
+import { lazy, Suspense } from "react";
 
-const MapComponent = lazy(() => import('./Map').then(m => ({ default: m.MapComponent })));
+const MapComponent = lazy(() => import("./Map").then(m => ({ default: m.MapComponent })));
 
 export const LazyMap = () => {
 	return (
 		<Suspense
 			fallback={
 				<Card>
-					<Flex justifyContent={'center'} alignItems={'center'} height={500}>
+					<Flex alignItems={"center"} height={500} justifyContent={"center"}>
 						<Loader size="l" />
 					</Flex>
 				</Card>

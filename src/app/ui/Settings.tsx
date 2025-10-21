@@ -1,21 +1,17 @@
-import { ArrowsRotateLeft, Moon, Sun } from '@gravity-ui/icons';
-import { Settings as GravitySettings } from '@gravity-ui/navigation';
-import { Icon, SegmentedRadioGroup } from '@gravity-ui/uikit';
-import { useLocalStorage } from 'usehooks-ts';
-
-export interface SettingsProps {
-	compact: boolean;
-}
+import { ArrowsRotateLeft, Moon, Sun } from "@gravity-ui/icons";
+import { Settings as GravitySettings } from "@gravity-ui/navigation";
+import { Icon, SegmentedRadioGroup } from "@gravity-ui/uikit";
+import { useLocalStorage } from "usehooks-ts";
 
 export const Settings = () => {
-	const [theme = 'system', setTheme] = useLocalStorage('theme', 'system');
+	const [theme = "system", setTheme] = useLocalStorage("theme", "system");
 
 	return (
-		<GravitySettings title="Настройки" filterPlaceholder="Поиск">
+		<GravitySettings filterPlaceholder="Поиск" title="Настройки">
 			<GravitySettings.Page title="Внешний вид">
 				<GravitySettings.Section title="Интерфейс">
 					<GravitySettings.Item title="Тема интерфейса">
-						<SegmentedRadioGroup size="l" value={theme} onUpdate={setTheme}>
+						<SegmentedRadioGroup onUpdate={setTheme} size="l" value={theme}>
 							<SegmentedRadioGroup.Option value="system">
 								<Icon data={ArrowsRotateLeft} />
 							</SegmentedRadioGroup.Option>

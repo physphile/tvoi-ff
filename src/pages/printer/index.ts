@@ -1,2 +1,2 @@
-export { PrinterLoginPage } from './PrinterLoginPage';
-export { PrinterPage } from './PrinterPage';
+export { PrinterLoginPage } from "./PrinterLoginPage";
+export { PrinterPage } from "./PrinterPage";

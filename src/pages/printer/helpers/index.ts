@@ -1,1 +1,1 @@
-export { getIsUnionMember } from './getIsUnionMember';
+export { getIsUnionMember } from "./getIsUnionMember";

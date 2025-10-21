@@ -1,19 +1,20 @@
-import { Text, type TextProps } from '@gravity-ui/uikit';
-import type { PropsWithChildren } from 'react';
+import type { PropsWithChildren } from "react";
 
-interface TextBoxProps extends TextProps, PropsWithChildren {
+import { Text, type TextProps } from "@gravity-ui/uikit";
+
+interface TextBoxProps extends PropsWithChildren, TextProps {
 	lines: number;
 }
 
-export const TextBox = ({ lines, style, children, ...props }: TextBoxProps) => {
+export const TextBox = ({ children, lines, style, ...props }: TextBoxProps) => {
 	return (
 		<Text
 			{...props}
 			style={{
-				overflow: 'hidden',
-				display: '-webkit-box',
+				display: "-webkit-box",
+				overflow: "hidden",
+				WebkitBoxOrient: "vertical",
 				WebkitLineClamp: lines,
-				WebkitBoxOrient: 'vertical',
 				...style,
 			}}
 		>

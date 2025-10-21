@@ -1,36 +1,35 @@
-import { getGroupByIdGroupIdGetOptions } from '@/shared/api/timetable/@tanstack/react-query.gen';
-import { Container, PageHeader } from '@/shared/ui';
-import { TimetableSchedule } from '@/widgets/timetable';
-import { Flex, Text, spacing } from '@gravity-ui/uikit';
-import { useQuery } from '@tanstack/react-query';
-import { useParams } from 'react-router';
+import { Flex, spacing, Text } from "@gravity-ui/uikit";
+import { useQuery } from "@tanstack/react-query";
+import { useParams } from "react-router";
+
+import { getGroupByIdGroupIdGetOptions } from "@/shared/api/timetable/@tanstack/react-query.gen";
+import { Container, PageHeader } from "@/shared/ui";
+import { TimetableSchedule } from "@/widgets/timetable";
 export const TimetableGroupPage = () => {
 	const params = useParams();
 	const groupId = Number(params.groupId);
 
-	const { data: group, isLoading: isGroupLoading } = useQuery(
-		getGroupByIdGroupIdGetOptions({ path: { id: groupId } })
-	);
+	const { data: group, isLoading: isGroupLoading } = useQuery(getGroupByIdGroupIdGetOptions({ path: { id: groupId } }));
 
 	return (
 		<Flex direction="column">
 			<PageHeader
 				breadcrumbs={[
-					{ label: 'Расписание', href: '/timetable' },
-					{ label: 'Группы', href: '/timetable/groups' },
+					{ href: "/timetable", label: "Расписание" },
+					{ href: "/timetable/groups", label: "Группы" },
 					{
-						label: `Группа №${group?.number}`,
 						href: `/timetable/groups/${groupId}`,
+						label: `Группа №${group?.number}`,
 						loading: isGroupLoading,
 					},
 				]}
 			/>
 			<Container>
-				<Text variant="header-1" className={spacing({ mb: 1 })}>
+				<Text className={spacing({ mb: 1 })} variant="header-1">
 					Группа №{group?.number}
 				</Text>
-				<Text variant="subheader-1" color="secondary" className={spacing({ mb: 4 })}>
-					{group?.name?.replace('каф.', 'Кафедра ')}
+				<Text className={spacing({ mb: 4 })} color="secondary" variant="subheader-1">
+					{group?.name?.replace("каф.", "Кафедра ")}
 				</Text>
 				<TimetableSchedule groupId={groupId} />
 			</Container>

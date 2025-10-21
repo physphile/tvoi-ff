@@ -1,2 +1,2 @@
-export { TimetableGroupsPage } from './TimetableGroupsPage';
-export { TimetableGroupPage } from './TimetableGroupPage';
+export { TimetableGroupPage } from "./TimetableGroupPage";
+export { TimetableGroupsPage } from "./TimetableGroupsPage";

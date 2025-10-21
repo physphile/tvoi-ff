@@ -1,16 +1,16 @@
-import { ActionBar } from '@gravity-ui/navigation';
-import { Breadcrumbs, Flex, Skeleton, spacing } from '@gravity-ui/uikit';
-import { type ReactNode, useMemo } from 'react';
-import { useNavigate } from 'react-router';
+import { ActionBar } from "@gravity-ui/navigation";
+import { Breadcrumbs, Flex, Skeleton, spacing } from "@gravity-ui/uikit";
+import { type ReactNode, useMemo } from "react";
+import { useNavigate } from "react-router";
 
-export interface PageHeaderProps {
-	breadcrumbs: {
-		label: ReactNode;
-		href: string;
-		loading?: boolean;
-		hide?: boolean;
-	}[];
+interface PageHeaderProps {
 	actions?: React.ReactNode;
+	breadcrumbs: {
+		hide?: boolean;
+		href: string;
+		label: ReactNode;
+		loading?: boolean;
+	}[];
 }
 
 export const PageHeader = (props: PageHeaderProps) => {
@@ -19,8 +19,8 @@ export const PageHeader = (props: PageHeaderProps) => {
 	const breadcrumbs = useMemo(
 		() => [
 			{
-				label: 'Главная',
-				href: '/',
+				href: "/",
+				label: "Главная",
 			},
 			...props.breadcrumbs,
 		],
@@ -28,15 +28,10 @@ export const PageHeader = (props: PageHeaderProps) => {
 	);
 	return (
 		<ActionBar>
-			<Flex
-				alignItems={'center'}
-				justifyContent={'space-between'}
-				width={'100%'}
-				className={spacing({ px: 3 })}
-			>
-				<Breadcrumbs style={{ width: '100%', alignItems: 'center' }}>
+			<Flex alignItems={"center"} className={spacing({ px: 3 })} justifyContent={"space-between"} width={"100%"}>
+				<Breadcrumbs style={{ alignItems: "center", width: "100%" }}>
 					{breadcrumbs.map(
-						({ href, label, loading, hide }, index) =>
+						({ hide, href, label, loading }, index) =>
 							!hide && (
 								<Breadcrumbs.Item
 									href={href}

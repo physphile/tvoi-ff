@@ -1,18 +1,17 @@
-import { getEventByIdEventIdGetOptions } from '@/shared/api/timetable/@tanstack/react-query.gen';
-import { getLecturerShortName } from '@/shared/helpers';
-import { Container, PageHeader } from '@/shared/ui';
-import { dateTime } from '@gravity-ui/date-utils';
-import { Flex, Link, Text, spacing } from '@gravity-ui/uikit';
-import { useQuery } from '@tanstack/react-query';
-import { useNavigate, useParams } from 'react-router';
+import { dateTime } from "@gravity-ui/date-utils";
+import { Flex, Link, spacing, Text } from "@gravity-ui/uikit";
+import { useQuery } from "@tanstack/react-query";
+import { useNavigate, useParams } from "react-router";
+
+import { getEventByIdEventIdGetOptions } from "@/shared/api/timetable/@tanstack/react-query.gen";
+import { getLecturerShortName } from "@/shared/helpers";
+import { Container, PageHeader } from "@/shared/ui";
 
 export const TimetableEventPage = () => {
 	const params = useParams();
 	const eventId = Number(params.eventId);
 
-	const { data: event, isLoading: isEventLoading } = useQuery(
-		getEventByIdEventIdGetOptions({ path: { id: eventId } })
-	);
+	const { data: event, isLoading: isEventLoading } = useQuery(getEventByIdEventIdGetOptions({ path: { id: eventId } }));
 
 	const navigate = useNavigate();
 
@@ -20,24 +19,24 @@ export const TimetableEventPage = () => {
 		<Flex direction="column">
 			<PageHeader
 				breadcrumbs={[
-					{ label: 'Расписание', href: '/timetable' },
-					{ label: 'События', href: '/timetable/events' },
+					{ href: "/timetable", label: "Расписание" },
+					{ href: "/timetable/events", label: "События" },
 					{
-						label: `${event?.name} ${dateTime({ input: event?.start_ts }).format('D MMMM')}`,
 						href: `/timetable/events/${eventId}`,
+						label: `${event?.name} ${dateTime({ input: event?.start_ts }).format("D MMMM")}`,
 						loading: isEventLoading,
 					},
 				]}
 			/>
 			<Container>
-				<Text variant="header-1" className={spacing({ mb: 1 })}>
+				<Text className={spacing({ mb: 1 })} variant="header-1">
 					{event?.name}
 				</Text>
-				<Text variant="subheader-1" color="secondary" className={spacing({ mb: 4 })}>
+				<Text className={spacing({ mb: 4 })} color="secondary" variant="subheader-1">
 					{event?.lecturer.map(l => (
 						<Link
-							key={l.id}
 							href={`/timetable/lecturers/${l.id}`}
+							key={l.id}
 							onClick={e => {
 								e.preventDefault();
 								navigate(`/timetable/lecturers/${l.id}`);
@@ -47,11 +46,11 @@ export const TimetableEventPage = () => {
 						</Link>
 					))}
 				</Text>
-				<Text variant="subheader-1" color="secondary" className={spacing({ mb: 4 })}>
+				<Text className={spacing({ mb: 4 })} color="secondary" variant="subheader-1">
 					{event?.room.map(r => (
 						<Link
-							key={r.id}
 							href={`/timetable/rooms/${r.id}`}
+							key={r.id}
 							onClick={e => {
 								e.preventDefault();
 								navigate(`/timetable/rooms/${r.id}`);

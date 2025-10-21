@@ -1,54 +1,54 @@
-import { AuthButton } from '@/features/AuthButton';
-import { AUTH_METHODS_LIST, AUTH_METHODS_MAP } from '@/features/lib';
-import type { AuthBackendAuthMethodSessionSession } from '@/shared/api/auth';
-import { capitalize } from '@/shared/helpers/capitalize';
-import { PageHeader } from '@/shared/ui';
-import { Flex, useToaster } from '@gravity-ui/uikit';
-import { useMount } from 'ahooks';
-import { useMemo } from 'react';
-import { useNavigate, useSearchParams } from 'react-router';
-import { useLocalStorage } from 'usehooks-ts';
-import { isAuthMethod } from './helpers';
-import { EmailLoginForm } from './ui';
+import { Flex, useToaster } from "@gravity-ui/uikit";
+import { useMount } from "ahooks";
+import { useMemo } from "react";
+import { useNavigate, useSearchParams } from "react-router";
+import { useLocalStorage } from "usehooks-ts";
+
+import type { AuthBackendAuthMethodSessionSession } from "@/shared/api/auth";
+
+import { AuthButton } from "@/features/AuthButton";
+import { AUTH_METHODS_LIST, AUTH_METHODS_MAP } from "@/features/lib";
+import { capitalize } from "@/shared/helpers/capitalize";
+import { PageHeader } from "@/shared/ui";
+
+import { isAuthMethod } from "./helpers";
+import { EmailLoginForm } from "./ui";
 
 export const LoginPage = () => {
 	const [searchParams, setSearchParams] = useSearchParams();
 	const navigate = useNavigate();
 
-	const method = useMemo(() => searchParams.get('method') ?? '', [searchParams]);
+	const method = useMemo(() => searchParams.get("method") ?? "", [searchParams]);
 
-	const [, setLoginData] = useLocalStorage<AuthBackendAuthMethodSessionSession | null>(
-		'login_data',
-		null
-	);
+	const [, setLoginData] = useLocalStorage<AuthBackendAuthMethodSessionSession | undefined>("login_data", undefined);
 
 	const toaster = useToaster();
 
 	useMount(async () => {
-		const result = searchParams.get('result');
+		const result = searchParams.get("result");
 
-		if (result === 'success') {
+		if (result === "success") {
 			toaster.add({
-				name: 'approve-email-success',
-				theme: 'success',
-				content: 'Почта подтверждена',
+				content: "Почта подтверждена",
+				name: "approve-email-success",
+				theme: "success",
 			});
 			setSearchParams({});
 			return;
 		}
 
-		if (result === 'error') {
+		if (result === "error") {
 			toaster.add({
-				name: 'approve-email-error',
-				theme: 'danger',
-				content: 'Не удалось подтвердить почту',
+				content: "Не удалось подтвердить почту",
+				name: "approve-email-error",
+				theme: "danger",
 			});
 			setSearchParams({});
 			return;
 		}
 
-		const code = searchParams.get('code');
-		const state = searchParams.get('state');
+		const code = searchParams.get("code");
+		const state = searchParams.get("state");
 
 		if (!code || !state) {
 			setSearchParams({});
@@ -57,9 +57,9 @@ export const LoginPage = () => {
 
 		if (!isAuthMethod(method)) {
 			toaster.add({
-				name: 'method-not-supported',
-				theme: 'danger',
-				content: 'Этот метод авторизации еще не поддержан',
+				content: "Этот метод авторизации еще не поддержан",
+				name: "method-not-supported",
+				theme: "danger",
 			});
 			setSearchParams({});
 			return;
@@ -68,38 +68,33 @@ export const LoginPage = () => {
 		const { login, register } = AUTH_METHODS_MAP[method];
 
 		const { data, error: loginError } = await login({
-			body: { scopes: [], state, code },
+			body: { code, scopes: [], state },
 		});
 
 		if (!loginError) {
 			toaster.add({
-				theme: 'success',
-				name: 'login-email-success',
-				content: 'Вход выполнен успешно',
+				content: "Вход выполнен успешно",
+				name: "login-email-success",
+				theme: "success",
 			});
 			setLoginData(data as AuthBackendAuthMethodSessionSession);
-			navigate('/profile');
+			navigate("/profile");
 
 			return;
 		}
 
-		// @ts-expect-error в автосгенерированных типах нет нормальных ошибок
 		const errorMatch = loginError.message.match(/^No users found for(.*)account$/);
 		if (errorMatch) {
 			toaster.add({
-				theme: 'utility',
-				name: 'login-method-error',
-				content: `Нет пользователя с таким ${capitalize(errorMatch[1].trim())} аккаунтом. Зарегистрироваться?`,
-				autoHiding: false,
 				actions: [
 					{
-						label: 'Зарегистрироваться',
+						label: "Зарегистрироваться",
 						onClick: async () => {
-							if (!('id_token' in loginError)) {
+							if (!("id_token" in loginError)) {
 								toaster.add({
-									theme: 'danger',
-									name: 'register-error',
-									content: 'Не удалось зарегистрироваться',
+									content: "Не удалось зарегистрироваться",
+									name: "register-error",
+									theme: "danger",
 								});
 
 								return;
@@ -110,33 +105,37 @@ export const LoginPage = () => {
 							});
 							if (registerError) {
 								toaster.add({
-									theme: 'danger',
-									name: 'register-error',
-									content: 'Не удалось зарегистрироваться',
+									content: "Не удалось зарегистрироваться",
+									name: "register-error",
+									theme: "danger",
 								});
 
 								return;
 							}
 
 							toaster.add({
-								theme: 'success',
-								name: 'register-success',
-								content: 'Регистрация выполнена успешно',
+								content: "Регистрация выполнена успешно",
+								name: "register-success",
+								theme: "success",
 							});
 
 							setLoginData(data as AuthBackendAuthMethodSessionSession);
-							navigate('/profile');
+							navigate("/profile");
 						},
 					},
 				],
+				autoHiding: false,
+				content: `Нет пользователя с таким ${capitalize(errorMatch[1].trim())} аккаунтом. Зарегистрироваться?`,
+				name: "login-method-error",
+				theme: "utility",
 			});
 			return;
 		}
 
 		toaster.add({
-			name: 'login-method-error',
-			theme: 'danger',
-			content: 'Не удалось войти',
+			content: "Не удалось войти",
+			name: "login-method-error",
+			theme: "danger",
 		});
 		setSearchParams({});
 		return;
@@ -147,14 +146,14 @@ export const LoginPage = () => {
 			<PageHeader
 				breadcrumbs={[
 					{
-						label: 'Вход',
-						href: '/login',
+						href: "/login",
+						label: "Вход",
 					},
 				]}
 			/>
-			<div style={{ margin: 'auto', width: 'clamp(200px, 100%, 600px)' }}>
+			<div style={{ margin: "auto", width: "clamp(200px, 100%, 600px)" }}>
 				<EmailLoginForm />
-				<Flex gap={2} wrap justifyContent={'center'} style={{ marginTop: 32 }}>
+				<Flex gap={2} justifyContent={"center"} style={{ marginTop: 32 }} wrap>
 					{AUTH_METHODS_LIST.map(method => (
 						<AuthButton key={method} method={method} size="l" style={{ width: 90 }} />
 					))}
