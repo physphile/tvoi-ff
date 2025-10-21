@@ -1,37 +1,39 @@
-import { stringToColor } from '@/shared/helpers/stringToColor';
-import { Avatar, Skeleton } from '@gravity-ui/uikit';
-import type { CSSProperties } from 'react';
+import type { CSSProperties } from "react";
 
-export interface ProfileAvatarProps {
+import { Avatar, Skeleton } from "@gravity-ui/uikit";
+
+import { stringToColor } from "@/shared/helpers/stringToColor";
+
+interface ProfileAvatarProps {
+	className?: string;
 	imgUrl: string;
+	loading?: boolean;
 	name: string;
 	style?: CSSProperties;
-	className?: string;
-	loading?: boolean;
 }
 
-export const ProfileAvatar = ({ imgUrl, name, style, className, loading }: ProfileAvatarProps) => {
+export const ProfileAvatar = ({ className, imgUrl, loading, name, style }: ProfileAvatarProps) => {
 	if (loading) {
 		return (
 			<Skeleton
+				className={className}
 				style={{
 					borderRadius: 999,
-					display: 'flex',
-					width: 'clamp(100px, 50vw, 200px)',
-					height: 'clamp(100px, 50vw, 200px)',
+					display: "flex",
+					height: "clamp(100px, 50vw, 200px)",
+					width: "clamp(100px, 50vw, 200px)",
 					...style,
 				}}
-				className={className}
 			/>
 		);
 	}
 
 	return (
 		<Avatar
-			imgUrl={imgUrl ?? 'kek'}
-			fallbackImgUrl={`https://ui-avatars.com/api/?name=${name.replace('@', '').slice(0, 2).toUpperCase()}&background=${stringToColor(name)}&color=fff`}
-			style={{ width: 'clamp(100px, 50vw, 200px)', height: 'clamp(100px, 50vw, 200px)', ...style }}
 			className={className}
+			fallbackImgUrl={`https://ui-avatars.com/api/?name=${name.replace("@", "").slice(0, 2).toUpperCase()}&background=${stringToColor(name)}&color=fff`}
+			imgUrl={imgUrl ?? "kek"}
+			style={{ height: "clamp(100px, 50vw, 200px)", width: "clamp(100px, 50vw, 200px)", ...style }}
 		/>
 	);
 };

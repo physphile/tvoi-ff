@@ -1,10 +1,9 @@
-import { type ReactNode, useMemo, useRef, useState } from 'react';
+import { useBoolean, useMemoizedFn } from "ahooks";
+import { type ReactNode, useMemo, useRef, useState } from "react";
 
-import { useBoolean, useMemoizedFn } from 'ahooks';
-
-export interface RenderModalOptions<CloseValue = void, ApplyValue = void, RejectValue = void> {
-	onClose: (value?: CloseValue) => void;
+interface RenderModalOptions<CloseValue = void, ApplyValue = void, RejectValue = void> {
 	onApply: (value?: ApplyValue) => void;
+	onClose: (value?: CloseValue) => void;
 	onReject: (value?: RejectValue) => void;
 	open: boolean;
 }
@@ -16,10 +15,10 @@ export const useModal = <CloseValue, ApplyValue, RejectValue, AdditionalData>(
 	) => ReactNode,
 	keepMounted = true
 ) => {
-	type ModalReturnValue = CloseValue | ApplyValue | undefined;
-	const resolveRef = useRef<((value: ModalReturnValue) => void) | null>(null);
-	const rejectRef = useRef<((value?: RejectValue) => void) | null>(null);
-	const [open, { setTrue: show, setFalse: hide }] = useBoolean(false);
+	type ModalReturnValue = ApplyValue | CloseValue | undefined;
+	const resolveRef = useRef<((value: ModalReturnValue) => void) | undefined>(undefined);
+	const rejectRef = useRef<((value?: RejectValue) => void) | undefined>(undefined);
+	const [open, { setFalse: hide, setTrue: show }] = useBoolean(false);
 	const [additionalData, setAdditionalData] = useState<AdditionalData>();
 
 	const showModal = useMemoizedFn(
@@ -59,7 +58,7 @@ export const useModal = <CloseValue, ApplyValue, RejectValue, AdditionalData>(
 						},
 						additionalData
 					)
-				: null,
+				: undefined,
 		[additionalData, handleApply, handleClose, handleReject, keepMounted, open, renderModal]
 	);
 

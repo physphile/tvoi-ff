@@ -1,14 +1,13 @@
-import { dateTime } from '@gravity-ui/date-utils';
-import type { EventGet } from '../api/timetable';
+import { dateTime } from "@gravity-ui/date-utils";
+
+import type { EventGet } from "../api/timetable";
 
 /**
  * Возвращает массив событий с количеством пересечений для каждого события
  * @param events массив событий
  * @returns массив событий с полем intersections
  */
-export const getEventsWithIntersections = <E extends Pick<EventGet, 'start_ts' | 'end_ts'>>(
-	events: E[]
-) =>
+export const getEventsWithIntersections = <E extends Pick<EventGet, "end_ts" | "start_ts">>(events: E[]) =>
 	events.map(event => {
 		let intersectionsCount = 0;
 

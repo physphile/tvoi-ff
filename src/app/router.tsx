@@ -1,10 +1,12 @@
-import { HomePage } from '@/pages/HomePage';
-import { LoginPage } from '@/pages/login';
-import { MapPage } from '@/pages/map';
-import { PrinterLoginPage, PrinterPage } from '@/pages/printer';
-import { checkPrinterAvailable } from '@/pages/printer/helpers/checkPrinterAvailable';
-import { ProfilePage } from '@/pages/profile';
-import { LecturerRatingPage, RatingPage } from '@/pages/rating';
+import { createBrowserRouter, createRoutesFromElements, redirect, Route } from "react-router";
+
+import { HomePage } from "@/pages/HomePage";
+import { LoginPage } from "@/pages/login";
+import { MapPage } from "@/pages/map";
+import { PrinterLoginPage, PrinterPage } from "@/pages/printer";
+import { checkPrinterAvailable } from "@/pages/printer/helpers/checkPrinterAvailable";
+import { ProfilePage } from "@/pages/profile";
+import { LecturerRatingPage, RatingPage } from "@/pages/rating";
 import {
 	TimetableEventPage,
 	TimetableEventsPage,
@@ -12,115 +14,115 @@ import {
 	TimetableGroupsPage,
 	TimetableLecturerPage,
 	TimetableRoomPage,
-} from '@/pages/timetable';
-import { approveEmailEmailApproveGet } from '@/shared/api/auth';
-import { Route, createBrowserRouter, createRoutesFromElements, redirect } from 'react-router';
-import { Layout } from './Layout';
+} from "@/pages/timetable";
+import { approveEmailEmailApproveGet } from "@/shared/api/auth";
+
+import { Layout } from "./Layout";
 
 export const router = createBrowserRouter(
 	createRoutesFromElements(
-		<Route path="*" element={<Layout />}>
+		<Route element={<Layout />} path="*">
 			<Route
-				path="auth/oauth-authorized/:method"
 				loader={async ({ params, request }) => {
 					const { method } = params;
 					const url = new URL(request.url);
-					url.searchParams.set('method', method ?? '');
+					url.searchParams.set("method", method ?? "");
 
 					return redirect(`/login?${url.searchParams.toString()}`);
 				}}
+				path="auth/oauth-authorized/:method"
 			/>
-			<Route path="" element={<HomePage />} loader={() => redirect('/timetable/groups')} />
+			<Route element={<HomePage />} loader={() => redirect("/timetable/groups")} path="" />
 
 			<Route
-				path="login"
 				element={<LoginPage />}
-				loader={() => (localStorage.getItem('login_data') ? redirect('/profile') : null)}
+				loader={() => (localStorage.getItem("login_data") ? redirect("/profile") : undefined)}
+				path="login"
 			/>
 			<Route
-				path="profile"
 				element={<ProfilePage />}
-				loader={() => (localStorage.getItem('login_data') ? null : redirect('/login'))}
+				loader={() => (localStorage.getItem("login_data") ? undefined : redirect("/login"))}
+				path="profile"
 			/>
 			<Route path="timetable">
-				<Route path="" loader={() => redirect('/timetable/groups')} />
+				<Route loader={() => redirect("/timetable/groups")} path="" />
 
 				<Route path="groups">
-					<Route path="" element={<TimetableGroupsPage />} />
-					<Route path=":groupId" element={<TimetableGroupPage />} />
+					<Route element={<TimetableGroupsPage />} path="" />
+					<Route element={<TimetableGroupPage />} path=":groupId" />
 				</Route>
 
 				<Route path="events">
-					<Route path="" element={<TimetableEventsPage />} />
-					<Route path=":eventId" element={<TimetableEventPage />} />
+					<Route element={<TimetableEventsPage />} path="" />
+					<Route element={<TimetableEventPage />} path=":eventId" />
 				</Route>
 
 				<Route path="rooms">
-					<Route path=":roomId" element={<TimetableRoomPage />} />
+					<Route element={<TimetableRoomPage />} path=":roomId" />
 				</Route>
 
 				<Route path="lecturers">
-					<Route path=":lecturerId" element={<TimetableLecturerPage />} />
+					<Route element={<TimetableLecturerPage />} path=":lecturerId" />
 				</Route>
 			</Route>
 
 			<Route path="rating">
-				<Route path="" element={<RatingPage />} />
-				<Route path="lecturer/:lecturerId" element={<LecturerRatingPage />} />
+				<Route element={<RatingPage />} path="" />
+				<Route element={<LecturerRatingPage />} path="lecturer/:lecturerId" />
 			</Route>
 
 			<Route path="map">
-				<Route path="" loader={() => redirect('/map/5')} />
-				<Route path=":floor" element={<MapPage />}>
-					<Route path=":roomName" element={<MapPage />} />
+				<Route loader={() => redirect("/map/5")} path="" />
+				<Route element={<MapPage />} path=":floor">
+					<Route element={<MapPage />} path=":roomName" />
 				</Route>
 			</Route>
 
 			<Route path="printer">
 				<Route
-					path=""
 					element={<PrinterPage />}
 					loader={async () => {
 						const isAvailable = await checkPrinterAvailable();
 
-						return isAvailable ? null : redirect('/printer/login');
+						return isAvailable ? undefined : redirect("/printer/login");
 					}}
+					path=""
 				/>
 				<Route
-					path="login"
 					element={<PrinterLoginPage />}
 					loader={async () => {
-						const loginData = localStorage.getItem('login_data');
+						const loginData = localStorage.getItem("login_data");
 
 						if (!loginData) {
-							return redirect('/login');
+							return redirect("/login");
 						}
 
 						const isAvailable = await checkPrinterAvailable();
 
-						return isAvailable ? redirect('/printer') : null;
+						return isAvailable ? redirect("/printer") : undefined;
 					}}
+					path="login"
 				/>
 			</Route>
 
 			<Route
-				path="auth/register/success"
 				loader={async ({ request }) => {
 					const url = new URL(request.url);
-					const token = url.searchParams.get('token');
+					const token = url.searchParams.get("token");
 
 					if (!token) {
-						return redirect('/login?result=error');
+						return redirect("/login?result=error");
 					}
 
 					const { error } = await approveEmailEmailApproveGet({ query: { token } });
 
 					if (error) {
-						return redirect('/login?result=error');
+						return redirect("/login?result=error");
 					}
 
-					return redirect('/login?result=success');
+					return redirect("/login?result=success");
 				}}
+				path="auth/register/success"
 			/>
 		</Route>
 	)

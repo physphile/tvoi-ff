@@ -1,51 +1,60 @@
+import { ConfirmDialog } from "@gravity-ui/components";
+import { DropdownMenu, useToaster } from "@gravity-ui/uikit";
+import { useMutation } from "@tanstack/react-query";
+import { useNavigate } from "react-router";
+
+import type { AuthBackendAuthMethodSessionSession } from "@/shared/api/auth/types.gen";
+
 import {
 	deleteUserUserUserIdDeleteMutation,
 	logoutLogoutPostMutation,
 	updateSessionSessionIdPatchMutation,
-} from '@/shared/api/auth/@tanstack/react-query.gen';
-import type { AuthBackendAuthMethodSessionSession } from '@/shared/api/auth/types.gen';
-import { useLoginData, useModal } from '@/shared/hooks';
-import { ConfirmDialog } from '@gravity-ui/components';
-import { DropdownMenu, useToaster } from '@gravity-ui/uikit';
-import { useMutation } from '@tanstack/react-query';
-import { useNavigate } from 'react-router';
+} from "@/shared/api/auth/@tanstack/react-query.gen";
+import { useLoginData, useModal } from "@/shared/hooks";
 
 export const ProfileDropdownMenu = () => {
-	const { token, removeLoginData, user_id, id: session_id, setLoginData } = useLoginData();
+	const { id: session_id, removeLoginData, setLoginData, token, user_id } = useLoginData();
 	const toaster = useToaster();
 	const navigate = useNavigate();
 
 	const { mutate: logout } = useMutation({
 		...logoutLogoutPostMutation(),
-		onSuccess: () => {
-			toaster.add({ name: 'logout-success', theme: 'success', content: 'Выход выполнен успешно' });
-			removeLoginData();
-			navigate('/login');
-		},
 		onError: error =>
 			toaster.add({
-				theme: 'danger',
-				name: 'logout-error',
-				content: 'ru' in error ? (error.ru as string) : 'Неизвестная ошибка',
+				content: "ru" in error ? (error.ru as string) : "Неизвестная ошибка",
+				name: "logout-error",
+				theme: "danger",
 			}),
+		onSuccess: () => {
+			toaster.add({ content: "Выход выполнен успешно", name: "logout-success", theme: "success" });
+			removeLoginData();
+			navigate("/login");
+		},
 	});
 
-	const [showModal, modal] = useModal(({ open, onReject, onApply }) => (
+	const [showModal, modal] = useModal(({ onApply, onReject, open }) => (
 		<ConfirmDialog
-			open={open}
-			onClose={onReject}
-			title="Подтвердите действие"
 			message="Вы уверены, что хотите удалить аккаунт?"
+			onClickButtonApply={onApply}
+			onClickButtonCancel={onReject}
+			onClose={onReject}
+			open={open}
+			propsButtonApply={{ view: "outlined-danger" }}
 			textButtonApply="Удалить"
 			textButtonCancel="Отмена"
-			onClickButtonCancel={onReject}
-			onClickButtonApply={onApply}
-			propsButtonApply={{ view: 'outlined-danger' }}
+			title="Подтвердите действие"
 		/>
 	));
 
 	const { mutate: updateSession } = useMutation({
 		...updateSessionSessionIdPatchMutation(),
+		onError: error => {
+			toaster.add({
+				content: "ru" in error ? (error.ru as string) : "Неизвестная ошибка",
+				name: "update-session-error",
+				theme: "danger",
+			});
+		},
 		onSuccess: data => {
 			setLoginData(data as AuthBackendAuthMethodSessionSession);
 			deleteUser({
@@ -55,44 +64,37 @@ export const ProfileDropdownMenu = () => {
 				},
 			});
 		},
-		onError: error => {
-			toaster.add({
-				theme: 'danger',
-				name: 'update-session-error',
-				content: 'ru' in error ? (error.ru as string) : 'Неизвестная ошибка',
-			});
-		},
 	});
 
 	const { mutate: deleteUser } = useMutation({
 		...deleteUserUserUserIdDeleteMutation(),
-		onSuccess: () => {
-			toaster.add({
-				name: 'delete-user-success',
-				theme: 'success',
-				content: 'Аккаунт успешно удален',
-			});
-			removeLoginData();
-			navigate('/login');
-		},
 		onError: error => {
-			if ((error.detail as unknown as string) === 'Not authorized') {
+			if ((error.detail as unknown as string) === "Not authorized") {
 				return updateSession({
 					auth: token,
+					body: {
+						scopes: ["auth.user.selfdelete"],
+					},
 					path: {
 						id: session_id,
-					},
-					body: {
-						scopes: ['auth.user.selfdelete'],
 					},
 				});
 			}
 
 			toaster.add({
-				theme: 'danger',
-				name: 'delete-user-error',
-				content: 'ru' in error ? (error.ru as string) : 'Неизвестная ошибка',
+				content: "ru" in error ? (error.ru as string) : "Неизвестная ошибка",
+				name: "delete-user-error",
+				theme: "danger",
 			});
+		},
+		onSuccess: () => {
+			toaster.add({
+				content: "Аккаунт успешно удален",
+				name: "delete-user-success",
+				theme: "success",
+			});
+			removeLoginData();
+			navigate("/login");
 		},
 	});
 
@@ -101,12 +103,10 @@ export const ProfileDropdownMenu = () => {
 			<DropdownMenu
 				items={[
 					{
-						text: 'Выйти',
 						action: () => logout({ auth: token }),
+						text: "Выйти",
 					},
 					{
-						text: 'Удалить аккаунт',
-						theme: 'danger',
 						action: async () => {
 							const isConfirmed = await showModal();
 
@@ -121,6 +121,8 @@ export const ProfileDropdownMenu = () => {
 								},
 							});
 						},
+						text: "Удалить аккаунт",
+						theme: "danger",
 					},
 				]}
 			/>

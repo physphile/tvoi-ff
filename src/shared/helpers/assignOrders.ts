@@ -1,7 +1,8 @@
-import { dateTime } from '@gravity-ui/date-utils';
-import type { EventGet } from '../api/timetable';
+import { dateTime } from "@gravity-ui/date-utils";
 
-export const assignOrders = <E extends Pick<EventGet, 'start_ts' | 'end_ts'>>(
+import type { EventGet } from "../api/timetable";
+
+export const assignOrders = <E extends Pick<EventGet, "end_ts" | "start_ts">>(
 	events: E[]
 ): Array<E & { order: number }> => {
 	type EventWithOrder = E & { order: number };

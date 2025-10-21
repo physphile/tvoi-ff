@@ -1,9 +1,10 @@
-import { getLecturerByIdLecturerIdGetOptions } from '@/shared/api/timetable/@tanstack/react-query.gen';
-import { getLecturerShortName } from '@/shared/helpers';
-import { Container, PageHeader } from '@/shared/ui';
-import { TimetableSchedule } from '@/widgets/timetable';
-import { useQuery } from '@tanstack/react-query';
-import { useParams } from 'react-router';
+import { useQuery } from "@tanstack/react-query";
+import { useParams } from "react-router";
+
+import { getLecturerByIdLecturerIdGetOptions } from "@/shared/api/timetable/@tanstack/react-query.gen";
+import { getLecturerShortName } from "@/shared/helpers";
+import { Container, PageHeader } from "@/shared/ui";
+import { TimetableSchedule } from "@/widgets/timetable";
 
 export const TimetableLecturerPage = () => {
 	const params = useParams();
@@ -17,11 +18,11 @@ export const TimetableLecturerPage = () => {
 		<>
 			<PageHeader
 				breadcrumbs={[
-					{ label: 'Расписание', href: '/timetable' },
-					{ label: 'Преподаватели', href: '/timetable/lecturers' },
+					{ href: "/timetable", label: "Расписание" },
+					{ href: "/timetable/lecturers", label: "Преподаватели" },
 					{
-						label: getLecturerShortName(lecturer),
 						href: `/timetable/lecturers/${lecturerId}`,
+						label: getLecturerShortName(lecturer),
 						loading: isLecturerLoading,
 					},
 				]}

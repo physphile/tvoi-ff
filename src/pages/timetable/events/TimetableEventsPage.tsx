@@ -1,25 +1,24 @@
+import { Flex, Select, Skeleton, spacing } from "@gravity-ui/uikit";
+import { useQuery } from "@tanstack/react-query";
+import { useSearchParams } from "react-router";
+
 import {
 	getGroupsGroupGetOptions,
 	getLecturersLecturerGetOptions,
 	getRoomsRoomGetOptions,
-} from '@/shared/api/timetable/@tanstack/react-query.gen';
-import { getLecturerShortName } from '@/shared/helpers';
-import { Container, PageHeader } from '@/shared/ui';
-import { TimetableSchedule } from '@/widgets/timetable';
-import { Flex, Select, Skeleton, spacing } from '@gravity-ui/uikit';
-import { useQuery } from '@tanstack/react-query';
-import { useSearchParams } from 'react-router';
+} from "@/shared/api/timetable/@tanstack/react-query.gen";
+import { getLecturerShortName } from "@/shared/helpers";
+import { Container, PageHeader } from "@/shared/ui";
+import { TimetableSchedule } from "@/widgets/timetable";
 
 export const TimetableEventsPage = () => {
 	const [searchParams, setSearchParams] = useSearchParams();
 
-	const roomId = searchParams.get('roomId');
-	const groupId = searchParams.get('groupId');
-	const lecturerId = searchParams.get('lecturerId');
+	const roomId = searchParams.get("roomId");
+	const groupId = searchParams.get("groupId");
+	const lecturerId = searchParams.get("lecturerId");
 
-	const { data: roomsData, isLoading: isRoomsLoading } = useQuery(
-		getRoomsRoomGetOptions({ query: { limit: 10e5 } })
-	);
+	const { data: roomsData, isLoading: isRoomsLoading } = useQuery(getRoomsRoomGetOptions({ query: { limit: 10e5 } }));
 	const { data: groupsData, isLoading: isGroupsLoading } = useQuery(
 		getGroupsGroupGetOptions({ query: { limit: 10e5 } })
 	);
@@ -37,12 +36,12 @@ export const TimetableEventsPage = () => {
 		<>
 			<PageHeader
 				breadcrumbs={[
-					{ label: 'Расписание', href: '/timetable' },
-					{ label: 'События', href: '/timetable/events' },
+					{ href: "/timetable", label: "Расписание" },
+					{ href: "/timetable/events", label: "События" },
 				]}
 			/>
 			<Container>
-				<Flex gap={3} className={spacing({ mb: 3 })}>
+				<Flex className={spacing({ mb: 3 })} gap={3}>
 					{isLoading ? (
 						<>
 							<Skeleton style={{ flex: 1, height: 28 }} />
@@ -52,51 +51,51 @@ export const TimetableEventsPage = () => {
 					) : (
 						<>
 							<Select
-								width="max"
-								placeholder="Выберите"
+								filterable
+								filterPlaceholder="Поиск"
+								hasClear
+								label="Кабинет"
+								onUpdate={([value]) => setSearchParams({ roomId: value })}
 								options={rooms.map(room => ({
 									content: room.name,
 									value: room.id.toString(),
 								}))}
-								onUpdate={([value]) => setSearchParams({ roomId: value })}
-								filterable
-								filterPlaceholder="Поиск"
-								label="Кабинет"
-								hasClear
+								placeholder="Выберите"
+								width="max"
 							/>
 							<Select
-								width="max"
-								placeholder="Выберите"
+								filterable
+								filterPlaceholder="Поиск"
+								hasClear
+								label="Группа"
+								onUpdate={([value]) => setSearchParams({ groupId: value })}
 								options={groups.map(group => ({
 									content: group.number,
 									value: group.id.toString(),
 								}))}
-								onUpdate={([value]) => setSearchParams({ groupId: value })}
-								filterable
-								filterPlaceholder="Поиск"
-								label="Группа"
-								hasClear
+								placeholder="Выберите"
+								width="max"
 							/>
 							<Select
-								width="max"
-								placeholder="Выберите"
+								filterable
+								filterPlaceholder="Поиск"
+								hasClear
+								label="Преподаватель"
+								onUpdate={([value]) => setSearchParams({ lecturerId: value })}
 								options={lecturers.map(lecturer => ({
 									content: getLecturerShortName(lecturer),
 									value: lecturer.id.toString(),
 								}))}
-								onUpdate={([value]) => setSearchParams({ lecturerId: value })}
-								filterable
-								filterPlaceholder="Поиск"
-								label="Преподаватель"
-								hasClear
+								placeholder="Выберите"
+								width="max"
 							/>
 						</>
 					)}
 				</Flex>
 				<TimetableSchedule
-					roomId={roomId ? Number(roomId) : undefined}
 					groupId={groupId ? Number(groupId) : undefined}
 					lecturerId={lecturerId ? Number(lecturerId) : undefined}
+					roomId={roomId ? Number(roomId) : undefined}
 				/>
 			</Container>
 		</>

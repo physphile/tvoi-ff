@@ -1,15 +1,11 @@
-import { useCallback } from 'react';
-import { useLocalStorage } from 'usehooks-ts';
+import { useCallback } from "react";
+import { useLocalStorage } from "usehooks-ts";
 
 export const useFavoriteGroups = () => {
-	const [favoriteGroups, setFavoriteGroups] = useLocalStorage<Set<number>>(
-		'favorite_groups',
-		new Set(),
-		{
-			serializer: value => JSON.stringify(Array.from(value)),
-			deserializer: value => new Set(JSON.parse(value)),
-		}
-	);
+	const [favoriteGroups, setFavoriteGroups] = useLocalStorage<Set<number>>("favorite_groups", new Set(), {
+		deserializer: value => new Set(JSON.parse(value)),
+		serializer: value => JSON.stringify([...value]),
+	});
 
 	const addFavoriteGroup = useCallback(
 		(groupId: number) => {
@@ -30,8 +26,8 @@ export const useFavoriteGroups = () => {
 	);
 
 	return {
-		favoriteGroups,
 		addFavoriteGroup,
+		favoriteGroups,
 		removeFavoriteGroup,
 	};
 };

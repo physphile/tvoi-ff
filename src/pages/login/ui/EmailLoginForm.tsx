@@ -1,15 +1,18 @@
-import type { AuthBackendAuthMethodSessionSession } from '@/shared/api/auth';
+import { Button, Flex, PasswordInput, spacing, TextInput, useToaster } from "@gravity-ui/uikit";
+import { useMutation } from "@tanstack/react-query";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { useNavigate } from "react-router";
+import { useLocalStorage } from "usehooks-ts";
+
+import type { AuthBackendAuthMethodSessionSession } from "@/shared/api/auth";
+
 import {
 	loginEmailLoginPostMutation,
 	registerEmailRegistrationPostMutation,
-} from '@/shared/api/auth/@tanstack/react-query.gen';
-import { Button, Flex, PasswordInput, TextInput, spacing, useToaster } from '@gravity-ui/uikit';
-import { useMutation } from '@tanstack/react-query';
-import { useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { useNavigate } from 'react-router';
-import { useLocalStorage } from 'usehooks-ts';
-import { ResetPasswordModal } from './ResetPasswordModal';
+} from "@/shared/api/auth/@tanstack/react-query.gen";
+
+import { ResetPasswordModal } from "./ResetPasswordModal";
 
 interface LoginForm {
 	email: string;
@@ -20,81 +23,78 @@ export const EmailLoginForm = () => {
 	const toaster = useToaster();
 	const navigate = useNavigate();
 
-	const { register, handleSubmit, getValues } = useForm<LoginForm>({
+	const { getValues, handleSubmit, register } = useForm<LoginForm>({
 		defaultValues: {
-			email: '',
-			password: '',
+			email: "",
+			password: "",
 		},
 	});
 
-	const [, setLoginData] = useLocalStorage<AuthBackendAuthMethodSessionSession | null>(
-		'login_data',
-		null
-	);
+	const [, setLoginData] = useLocalStorage<AuthBackendAuthMethodSessionSession | undefined>("login_data", undefined);
 
 	const { mutate: registerEmail } = useMutation({
 		...registerEmailRegistrationPostMutation(),
+		onError: error =>
+			toaster.add({
+				content: "ru" in error ? (error.ru as string) : "Неизвестная ошибка",
+				name: "register-email-error",
+				theme: "danger",
+			}),
 		onSuccess: data => {
 			toaster.add({
-				name: 'register-email-success',
-				theme: 'utility',
-				content: `${data.ru}. После смены пароля можете войти.`,
-				autoHiding: false,
 				actions: [
 					{
-						label: 'Войти',
+						label: "Войти",
 						onClick: () => loginEmail({ body: { ...getValues() } }),
 					},
 				],
+				autoHiding: false,
+				content: `${data.ru}. После смены пароля можете войти.`,
+				name: "register-email-success",
+				theme: "utility",
 			});
 		},
-		onError: error =>
-			toaster.add({
-				theme: 'danger',
-				name: 'register-email-error',
-				content: 'ru' in error ? (error.ru as string) : 'Неизвестная ошибка',
-			}),
 	});
 
 	const { mutate: loginEmail } = useMutation({
 		...loginEmailLoginPostMutation(),
-		onSuccess: data => {
-			toaster.removeAll();
-			toaster.add({
-				theme: 'success',
-				name: 'login-email-success',
-				content: 'Вход выполнен успешно',
-			});
-			setLoginData(data);
-			navigate('/profile');
-		},
 		onError: error => {
 			// @ts-expect-error в автосгенерированных типах нет нормальных ошибок
-			if (error.message === 'Incorrect login or password') {
+			if (error.message === "Incorrect login or password") {
 				toaster.add({
-					theme: 'utility',
-					name: 'login-email-error',
-					content: 'Неверный Email / Пароль. Зарегистрироваться?',
-					autoHiding: false,
 					actions: [
 						{
-							label: 'Зарегистрироваться',
+							label: "Зарегистрироваться",
 							onClick: () => registerEmail({ body: getValues() }),
 						},
 					],
+					autoHiding: false,
+					content: "Неверный Email / Пароль. Зарегистрироваться?",
+					name: "login-email-error",
+					theme: "utility",
 				});
 			} else {
 				toaster.add({
-					theme: 'danger',
-					name: 'login-email-error',
-					content: 'ru' in error ? (error.ru as string) : 'Неизвестная ошибка',
+					content: "ru" in error ? (error.ru as string) : "Неизвестная ошибка",
+					name: "login-email-error",
+					theme: "danger",
 				});
 			}
+		},
+		onSuccess: data => {
+			toaster.removeAll();
+			toaster.add({
+				content: "Вход выполнен успешно",
+				name: "login-email-success",
+				theme: "success",
+			});
+			setLoginData(data);
+			navigate("/profile");
 		},
 	});
 
 	const onSubmit = async (data: LoginForm) => {
-		loginEmail({ body: { ...data, scopes: ['auth.user.selfdelete'] } });
+		loginEmail({ body: { ...data, scopes: ["auth.user.selfdelete"] } });
 	};
 
 	const [isRestorePasswordModalVisible, setIsRestorePasswordModalVisible] = useState(false);
@@ -103,34 +103,34 @@ export const EmailLoginForm = () => {
 		<>
 			<form onSubmit={handleSubmit(onSubmit)}>
 				<Flex direction="column" gap={3}>
-					<TextInput {...register('email')} label="Email" type="email" size="xl" />
+					<TextInput {...register("email")} label="Email" size="xl" type="email" />
 					<PasswordInput
-						{...{ ...register('password'), ref: undefined }}
+						{...{ ...register("password"), ref: undefined }}
+						controlRef={register("password").ref}
 						label="Пароль"
 						size="xl"
-						controlRef={register('password').ref}
 					/>
-					<Button type="submit" view="action" size="xl" className={spacing({ mt: 4 })}>
+					<Button className={spacing({ mt: 4 })} size="xl" type="submit" view="action">
 						Войти / Зарегистрироваться
 					</Button>
 					<Button
-						type="button"
-						view="outlined"
-						size="xl"
 						className={spacing({ mt: 1 })}
 						onClick={() => {
 							setIsRestorePasswordModalVisible(true);
-							toaster.remove('login-email-error');
+							toaster.remove("login-email-error");
 						}}
+						size="xl"
+						type="button"
+						view="outlined"
 					>
 						Восстановить пароль
 					</Button>
 				</Flex>
 			</form>
 			<ResetPasswordModal
-				open={isRestorePasswordModalVisible}
+				email={getValues("email")}
 				onClose={() => setIsRestorePasswordModalVisible(false)}
-				email={getValues('email')}
+				open={isRestorePasswordModalVisible}
 			/>
 		</>
 	);

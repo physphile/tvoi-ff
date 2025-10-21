@@ -1,2 +1,2 @@
-export { RatingPage } from './RatingPage';
-export { LecturerRatingPage } from './LecturerRatingPage';
+export { LecturerRatingPage } from "./LecturerRatingPage";
+export { RatingPage } from "./RatingPage";

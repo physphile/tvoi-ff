@@ -1,9 +1,9 @@
-import { PageHeader } from '@/shared/ui/PageHeader';
+import { PageHeader } from "@/shared/ui/PageHeader";
 
 export const HomePage = () => {
 	return (
 		<>
-			<PageHeader breadcrumbs={[]} actions={[]} />
+			<PageHeader actions={[]} breadcrumbs={[]} />
 		</>
 	);
 };

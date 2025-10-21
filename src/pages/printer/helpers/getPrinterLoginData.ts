@@ -1,21 +1,21 @@
-import { getUserInfoUserIdGet } from '@/shared/api/userdata';
+import { getUserInfoUserIdGet } from "@/shared/api/userdata";
 
 export const getPrinterLoginData = async () => {
-	const loginData = localStorage.getItem('login_data');
+	const loginData = localStorage.getItem("login_data");
 
 	if (!loginData) {
-		return null;
+		return undefined;
 	}
 
-	const { user_id, token } = JSON.parse(loginData);
+	const { token, user_id } = JSON.parse(loginData);
 
 	const { data } = await getUserInfoUserIdGet({
-		path: { id: user_id },
 		auth: token,
+		path: { id: user_id },
 	});
 
-	const surname = data?.items.find(item => item.param === 'Фамилия')?.value;
-	const number = data?.items.find(item => item.param === 'Номер профсоюзного билета')?.value;
+	const surname = data?.items.find(item => item.param === "Фамилия")?.value;
+	const number = data?.items.find(item => item.param === "Номер профсоюзного билета")?.value;
 
-	return { surname, number };
+	return { number, surname };
 };

@@ -24,7 +24,7 @@ export const findLcm = (numbers: number[]): number => {
 	}
 
 	if (nonZeroNumbers.some(n => !Number.isInteger(n))) {
-		throw new Error('Все числа должны быть целыми');
+		throw new Error("Все числа должны быть целыми");
 	}
 
 	return nonZeroNumbers.reduce((acc, curr) => lcmPair(acc, curr));

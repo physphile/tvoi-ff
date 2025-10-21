@@ -1,8 +1,9 @@
-import { Container, PageHeader } from '@/shared/ui';
+import { Flex, Select } from "@gravity-ui/uikit";
+import { useNavigate, useParams } from "react-router";
 
-import { Flex, Select } from '@gravity-ui/uikit';
-import { useNavigate, useParams } from 'react-router';
-import { LazyMap } from './ui';
+import { Container, PageHeader } from "@/shared/ui";
+
+import { LazyMap } from "./ui";
 
 export const MapPage = () => {
 	const navigate = useNavigate();
@@ -15,28 +16,28 @@ export const MapPage = () => {
 		<>
 			<PageHeader
 				breadcrumbs={[
-					{ href: '/map', label: 'Схема этажей' },
+					{ href: "/map", label: "Схема этажей" },
 					{ href: `/map/${floor}`, label: `Этаж ${floor === 0 ? -1 : floor}` },
 					{
+						hide: !roomName,
 						href: `/map/${floor}/${roomName}`,
 						label: roomName,
-						hide: !roomName,
 					},
 				]}
 			/>
 			<Container>
-				<Flex gap={2} direction={'column'}>
+				<Flex direction={"column"} gap={2}>
 					<Select
-						size="xl"
-						width={128}
-						value={[floor.toString()]}
 						onUpdate={([f]) => {
 							navigate(`/map/${f}`);
 						}}
 						options={[-1, 1, 2, 3, 4, 5].map(f => ({
 							content: `Этаж ${f}`,
-							value: f === -1 ? '0' : f.toString(),
+							value: f === -1 ? "0" : f.toString(),
 						}))}
+						size="xl"
+						value={[floor.toString()]}
+						width={128}
 					/>
 					<LazyMap />
 				</Flex>

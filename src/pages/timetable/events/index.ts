@@ -1,2 +1,2 @@
-export { TimetableEventsPage } from './TimetableEventsPage';
-export { TimetableEventPage } from './TimetableEventPage';
+export { TimetableEventPage } from "./TimetableEventPage";
+export { TimetableEventsPage } from "./TimetableEventsPage";

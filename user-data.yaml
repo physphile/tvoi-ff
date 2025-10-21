@@ -1,6 +1,0 @@
-users:
-- name: physphile
-  sudo: 'ALL=(ALL) NOPASSWD:ALL'
-  shell: /bin/bash
-  ssh_authorized_keys:
-  - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIM2xLhjI+XaXzTS9wPY8yK09wupojIuu+cW+1jVxooHu physphile@physphile-osx

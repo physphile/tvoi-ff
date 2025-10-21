@@ -1,42 +1,46 @@
-import { getEventsEventGetOptions } from '@/shared/api/timetable/@tanstack/react-query.gen';
-import { Schedule } from '@/shared/ui';
-import { dateTime } from '@gravity-ui/date-utils';
-import { NoSearchResults } from '@gravity-ui/illustrations';
-import { useQuery } from '@tanstack/react-query';
-import { useMemo, useState } from 'react';
-import { useMediaQuery } from 'usehooks-ts';
+import { dateTime } from "@gravity-ui/date-utils";
+import { NoSearchResults } from "@gravity-ui/illustrations";
+import { useQuery } from "@tanstack/react-query";
+import { useMemo, useState } from "react";
+import { useMediaQuery } from "usehooks-ts";
+
+import { getEventsEventGetOptions } from "@/shared/api/timetable/@tanstack/react-query.gen";
+import { Schedule } from "@/shared/ui";
 
 interface TimetableScheduleProps {
 	groupId?: number;
-	roomId?: number;
 	lecturerId?: number;
+	roomId?: number;
 }
 
-export const TimetableSchedule = ({ groupId, roomId, lecturerId }: TimetableScheduleProps) => {
-	const isMobile = useMediaQuery('(max-width: 768px)');
+export const TimetableSchedule = ({ groupId, lecturerId, roomId }: TimetableScheduleProps) => {
+	const isMobile = useMediaQuery("(max-width: 768px)");
 
 	const [currentDate, setCurrentDate] = useState(dateTime());
 	const [showedWeekdays, setShowedWeekdays] = useState<1 | 3 | 7>(isMobile ? 3 : 7);
 
 	const period = useMemo(() => {
 		switch (showedWeekdays) {
-			case 1:
-				return { start: currentDate, end: currentDate.add(1, 'day') };
-			case 3:
-				return { start: currentDate.subtract(1, 'day'), end: currentDate.add(1, 'day') };
-			case 7:
-				return { start: currentDate.set({ weekday: 0 }), end: currentDate.set({ weekday: 6 }) };
+			case 1: {
+				return { end: currentDate.add(1, "day"), start: currentDate };
+			}
+			case 3: {
+				return { end: currentDate.add(1, "day"), start: currentDate.subtract(1, "day") };
+			}
+			case 7: {
+				return { end: currentDate.set({ weekday: 6 }), start: currentDate.set({ weekday: 0 }) };
+			}
 		}
 	}, [currentDate, showedWeekdays]);
 
-	const { data, isLoading, error } = useQuery(
+	const { data, error, isLoading } = useQuery(
 		getEventsEventGetOptions({
 			query: {
+				end: period.end.format("YYYY-MM-DD"),
 				group_id: groupId,
-				room_id: roomId,
 				lecturer_id: lecturerId,
-				start: period.start.format('YYYY-MM-DD'),
-				end: period.end.format('YYYY-MM-DD'),
+				room_id: roomId,
+				start: period.start.format("YYYY-MM-DD"),
 			},
 		})
 	);
@@ -45,14 +49,14 @@ export const TimetableSchedule = ({ groupId, roomId, lecturerId }: TimetableSche
 
 	return (
 		<Schedule
+			date={currentDate}
 			events={events}
 			isLoading={isLoading}
-			date={currentDate}
 			onDateUpdate={setCurrentDate}
-			overlay={error ? <NoSearchResults /> : undefined}
-			showedWeekdays={showedWeekdays}
 			onShowedWeekdaysUpdate={setShowedWeekdays}
+			overlay={error ? <NoSearchResults /> : undefined}
 			period={period}
+			showedWeekdays={showedWeekdays}
 		/>
 	);
 };

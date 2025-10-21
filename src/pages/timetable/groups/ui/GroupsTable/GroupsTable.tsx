@@ -1,33 +1,36 @@
-import { getGroupsGroupGetOptions } from '@/shared/api/timetable/@tanstack/react-query.gen';
-import { useFavoriteGroups } from '@/shared/hooks';
-import { Star, StarFill } from '@gravity-ui/icons';
-import { Table, useTable } from '@gravity-ui/table';
-import type { ColumnDef } from '@gravity-ui/table/tanstack';
-import { Button, Icon } from '@gravity-ui/uikit';
-import { useQuery } from '@tanstack/react-query';
-import { useCallback, useMemo } from 'react';
-import { useNavigate } from 'react-router';
+import type { ColumnDef } from "@gravity-ui/table/tanstack";
 
-import type { GroupGet } from '@/shared/api/timetable';
-import styles from './GroupsTable.module.css';
+import { Star, StarFill } from "@gravity-ui/icons";
+import { Table, useTable } from "@gravity-ui/table";
+import { Button, Icon } from "@gravity-ui/uikit";
+import { useQuery } from "@tanstack/react-query";
+import { useCallback, useMemo } from "react";
+import { useNavigate } from "react-router";
+
+import type { GroupGet } from "@/shared/api/timetable";
+
+import { getGroupsGroupGetOptions } from "@/shared/api/timetable/@tanstack/react-query.gen";
+import { useFavoriteGroups } from "@/shared/hooks";
+
+import styles from "./GroupsTable.module.css";
 
 const staticColumns: ColumnDef<GroupGet>[] = [
 	{
-		accessorKey: 'id',
-		header: 'id',
+		accessorKey: "id",
+		header: "id",
 		maxSize: 80,
 	},
 	{
-		accessorKey: 'number',
-		header: 'Номер',
+		accessorKey: "number",
+		header: "Номер",
 		maxSize: 80,
 	},
 	{
-		accessorKey: 'name',
-		header: 'Название',
+		accessorKey: "name",
 		cell: ({ getValue }) => {
-			return getValue<string>().replace('каф.', 'Кафедра ');
+			return getValue<string>().replace("каф.", "Кафедра ");
 		},
+		header: "Название",
 	},
 ];
 
@@ -38,13 +41,12 @@ interface GroupsTableProps {
 export const GroupsTable = ({ search }: GroupsTableProps) => {
 	const navigate = useNavigate();
 
-	const { data } = useQuery(
-		getGroupsGroupGetOptions({ query: { limit: Number.MAX_SAFE_INTEGER } })
-	);
+	const { data: groups = [] } = useQuery({
+		...getGroupsGroupGetOptions({ query: { limit: Number.MAX_SAFE_INTEGER } }),
+		select: data => data.items,
+	});
 
-	const groups = data?.items ?? [];
-
-	const { favoriteGroups, addFavoriteGroup, removeFavoriteGroup } = useFavoriteGroups();
+	const { addFavoriteGroup, favoriteGroups, removeFavoriteGroup } = useFavoriteGroups();
 
 	const onFavoriteClick = useCallback(
 		(groupId: number) => {
@@ -61,21 +63,21 @@ export const GroupsTable = ({ search }: GroupsTableProps) => {
 		return [
 			...staticColumns,
 			{
-				id: 'favorite',
-				header: '',
 				cell: ({ row }) => (
 					<Button
-						view="flat"
-						size="xs"
 						onClick={e => {
 							e.stopPropagation();
 							e.preventDefault();
-							onFavoriteClick(row.getValue('id'));
+							onFavoriteClick(row.getValue("id"));
 						}}
+						size="xs"
+						view="flat"
 					>
-						<Icon data={favoriteGroups.has(row.getValue('id')) ? StarFill : Star} />
+						<Icon data={favoriteGroups.has(row.getValue("id")) ? StarFill : Star} />
 					</Button>
 				),
+				header: "",
+				id: "favorite",
 			},
 		];
 	}, [onFavoriteClick, favoriteGroups]);
@@ -85,13 +87,12 @@ export const GroupsTable = ({ search }: GroupsTableProps) => {
 			groups
 				.filter(n => !Number.isNaN(Number.parseInt(n.number)))
 				.filter(
-					({ number, name }) =>
-						number.toLowerCase().includes(search.toLowerCase()) ||
-						name?.toLowerCase().includes(search.toLowerCase())
+					({ name, number }) =>
+						number.toLowerCase().includes(search.toLowerCase()) || name?.toLowerCase().includes(search.toLowerCase())
 				)
 				.toSorted((a, b) => {
-					if (a.number.includes('м') && !b.number.includes('м')) return 1;
-					if (!a.number.includes('м') && b.number.includes('м')) return -1;
+					if (a.number.includes("м") && !b.number.includes("м")) return 1;
+					if (!a.number.includes("м") && b.number.includes("м")) return -1;
 					return Number.parseInt(a.number) - Number.parseInt(b.number);
 				})
 				.toSorted((a, b) => {
@@ -103,19 +104,19 @@ export const GroupsTable = ({ search }: GroupsTableProps) => {
 	);
 
 	const table = useTable({
-		data: sortedData,
 		columns,
+		data: sortedData,
 	});
 
 	return (
 		<Table
-			table={table}
 			className={styles.table}
-			size="s"
 			key={favoriteGroups.size}
 			onRowClick={({ getValue }) => {
-				navigate(`/timetable/groups/${getValue('id')}`);
+				navigate(`/timetable/groups/${getValue("id")}`);
 			}}
+			size="s"
+			table={table}
 		/>
 	);
 };

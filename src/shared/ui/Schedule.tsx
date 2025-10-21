@@ -1,69 +1,59 @@
-import { type DateTime, dateTime } from '@gravity-ui/date-utils';
-import { ArrowLeft, ArrowRight } from '@gravity-ui/icons';
-import {
-	Button,
-	Flex,
-	Icon,
-	Overlay,
-	SegmentedRadioGroup,
-	Text,
-	TextInput,
-} from '@gravity-ui/uikit';
-import { Loader } from '@gravity-ui/uikit';
-import { type ReactNode, useCallback, useEffect, useMemo, useState } from 'react';
-import { useMediaQuery } from 'usehooks-ts';
-import type { EventGet } from '../api/timetable';
-import { findLcm, getEventsWithIntersections } from '../helpers';
-import { assignOrders } from '../helpers/assignOrders';
-import { EventCard } from './EventCard';
+import { type DateTime, dateTime } from "@gravity-ui/date-utils";
+import { ArrowLeft, ArrowRight } from "@gravity-ui/icons";
+import { Button, Flex, Icon, Loader, Overlay, SegmentedRadioGroup, Text, TextInput } from "@gravity-ui/uikit";
+import { type ReactNode, useCallback, useEffect, useMemo, useState } from "react";
+import { useMediaQuery } from "usehooks-ts";
+
+import type { EventGet } from "../api/timetable";
+
+import { findLcm, getEventsWithIntersections } from "../helpers";
+import { assignOrders } from "../helpers/assignOrders";
+import { EventCard } from "./EventCard";
 
 export interface ScheduleProps {
-	events: EventGet[];
-	isLoading?: boolean;
 	date: DateTime;
-	onDateUpdate: (date: DateTime) => void;
-	hourStart: number;
+	events: EventGet[];
 	hourEnd: number;
+	hourStart: number;
+	isLoading?: boolean;
+	onDateUpdate: (date: DateTime) => void;
+	onShowedWeekdaysUpdate: (weekdays: 1 | 3 | 7) => void;
+	overlay?: ReactNode;
+	period: { end: DateTime; start: DateTime };
 	quantumTimeUnit: number;
 	quantumTimeUnitHeight: number;
-	overlay?: ReactNode;
-	onShowedWeekdaysUpdate: (weekdays: 1 | 3 | 7) => void;
 	showedWeekdays: 1 | 3 | 7;
-	period: { start: DateTime; end: DateTime };
 }
 
 export const Schedule = ({
-	events,
-	isLoading = false,
 	date,
-	onDateUpdate,
-	hourStart,
+	events,
 	hourEnd,
+	hourStart,
+	isLoading = false,
+	onDateUpdate,
+	onShowedWeekdaysUpdate,
+	overlay,
+	period,
 	quantumTimeUnit,
 	quantumTimeUnitHeight,
-	overlay,
-	onShowedWeekdaysUpdate,
 	showedWeekdays,
-	period,
 }: ScheduleProps) => {
 	const hoursCount = hourEnd - hourStart;
 	const quantaInHour = 60 / quantumTimeUnit;
 
 	const getDayStart = useCallback(
-		(date: string | DateTime) => {
+		(date: DateTime | string) => {
 			return dateTime({ input: date }).set({
 				hour: hourStart,
+				millisecond: 0,
 				minute: 0,
 				second: 0,
-				millisecond: 0,
 			});
 		},
 		[hourStart]
 	);
-	const eventsWithIntersections = useMemo(
-		() => assignOrders(getEventsWithIntersections(events)),
-		[events]
-	);
+	const eventsWithIntersections = useMemo(() => assignOrders(getEventsWithIntersections(events)), [events]);
 
 	const lcm = useMemo(
 		() => findLcm(eventsWithIntersections.map(event => event.intersections)),
@@ -75,8 +65,8 @@ export const Schedule = ({
 			eventsWithIntersections.map(event => {
 				const d = dateTime({ input: event.start_ts });
 				const dayStart = getDayStart(event.start_ts);
-				const deltaStart = d.diff(dayStart, 'minutes');
-				const deltaEnd = dateTime({ input: event.end_ts }).diff(dayStart, 'minutes');
+				const deltaStart = d.diff(dayStart, "minutes");
+				const deltaEnd = dateTime({ input: event.end_ts }).diff(dayStart, "minutes");
 				const gridRowStart = Math.round(deltaStart / quantumTimeUnit) + 1;
 				const gridRowEnd = Math.round(deltaEnd / quantumTimeUnit) + 1;
 
@@ -84,79 +74,77 @@ export const Schedule = ({
 				const gridColumnEnd = gridColumnStart + lcm / event.intersections;
 
 				return {
-					style: {
-						gridRowStart,
-						gridRowEnd,
-						gridColumnStart,
-						gridColumnEnd,
-					},
 					event,
+					style: {
+						gridColumnEnd,
+						gridColumnStart,
+						gridRowEnd,
+						gridRowStart,
+					},
 				};
 			}) ?? [],
 		[eventsWithIntersections, lcm, getDayStart, quantumTimeUnit, period.start]
 	);
 
-	const [currentOffset, setCurrentOffset] = useState(
-		dateTime().diff(getDayStart(dateTime()), 'minutes')
-	);
+	const [currentOffset, setCurrentOffset] = useState(dateTime().diff(getDayStart(dateTime()), "minutes"));
 
-	const isMobile = useMediaQuery('(max-width: 768px)');
+	const isMobile = useMediaQuery("(max-width: 768px)");
 
 	useEffect(() => {
 		const interval = setInterval(() => {
-			setCurrentOffset(dateTime().diff(getDayStart(dateTime()), 'minutes'));
+			setCurrentOffset(dateTime().diff(getDayStart(dateTime()), "minutes"));
 		}, 60e3);
 		return () => clearInterval(interval);
 	}, [getDayStart]);
 
 	return (
-		<Flex direction={'column'}>
-			<Flex gap={2} justifyContent={'space-between'} direction={isMobile ? 'column' : 'row'}>
+		<Flex direction={"column"}>
+			<Flex direction={isMobile ? "column" : "row"} gap={2} justifyContent={"space-between"}>
 				<Flex>
 					<Button
-						onClick={() => onDateUpdate(date.subtract(showedWeekdays, 'day'))}
+						onClick={() => onDateUpdate(date.subtract(showedWeekdays, "day"))}
 						pin="round-brick"
-						view="outlined"
 						size="xl"
+						view="outlined"
 					>
 						<Icon data={ArrowLeft} />
 					</Button>
 					<TextInput
-						size="xl"
 						pin="brick-brick"
 						readOnly
+						size="xl"
 						value={
 							showedWeekdays === 1
-								? `${period.start.format('D MMMM')}`
-								: `${period.start.format('D MMMM')} – ${period.end.format('D MMMM')}`
+								? `${period.start.format("D MMMM")}`
+								: `${period.start.format("D MMMM")} – ${period.end.format("D MMMM")}`
 						}
 					/>
 					<Button
-						size="xl"
-						onClick={() => onDateUpdate(date.add(showedWeekdays, 'day'))}
-						view="outlined"
+						onClick={() => onDateUpdate(date.add(showedWeekdays, "day"))}
 						pin="brick-round"
+						size="xl"
+						view="outlined"
 					>
 						<Icon data={ArrowRight} />
 					</Button>
 				</Flex>
 				<SegmentedRadioGroup
-					size="xl"
-					value={showedWeekdays.toString()}
-					options={[
-						{ value: '1', content: '1 день' },
-						{ value: '3', content: '3 дня' },
-						{ value: '7', content: '7 дней' },
-					]}
 					onUpdate={value => {
 						onShowedWeekdaysUpdate(Number(value) as 1 | 3 | 7);
 					}}
+					options={[
+						{ content: "1 день", value: "1" },
+						{ content: "3 дня", value: "3" },
+						{ content: "7 дней", value: "7" },
+					]}
+					size="xl"
+					value={showedWeekdays.toString()}
 				/>
 			</Flex>
 
 			<div
 				style={{
-					display: 'grid',
+					display: "grid",
 					gridTemplateColumns: `50px repeat(${showedWeekdays}, minmax(0, 1fr))`,
 					gridTemplateRows: `100px repeat(${hoursCount}, ${quantumTimeUnitHeight * quantaInHour}px)`,
 				}}
@@ -164,46 +152,46 @@ export const Schedule = ({
 				{/* subgrid */}
 				<div
 					style={{
-						display: 'grid',
+						containerType: "size",
+						display: "grid",
+						gridColumn: `2 / ${2 + showedWeekdays}`,
+						gridRow: "2 / 12",
 						gridTemplateColumns: `repeat(${lcm * showedWeekdays}, minmax(0, 1fr))`,
 						gridTemplateRows: `repeat(${hoursCount * quantaInHour}, ${quantumTimeUnitHeight}px)`,
-						position: 'relative',
-						gridColumn: `2 / ${2 + showedWeekdays}`,
-						gridRow: '2 / 12',
-						containerType: 'size',
+						position: "relative",
 					}}
 				>
 					{transformedEvents.map(({ event, style }) => (
-						<EventCard key={event.id} event={event} style={style} />
+						<EventCard event={event} key={event.id} style={style} />
 					))}
 
 					{/* now line */}
 					{dateTime().hour() < hourEnd &&
 						dateTime().hour() > hourStart &&
-						date.format('YYYY-MM-DD') === dateTime().format('YYYY-MM-DD') &&
+						date.format("YYYY-MM-DD") === dateTime().format("YYYY-MM-DD") &&
 						dateTime().weekday() < showedWeekdays && (
 							<div
 								style={{
-									height: 2,
-									background: 'red',
-									position: 'absolute',
+									background: "red",
 									borderRadius: 999,
-									width: `calc(100% / ${showedWeekdays})`,
-									transform: `translate(calc(100cqw / ${showedWeekdays} * ${dateTime().weekday()}), calc(100cqh / ${hoursCount} / 60 * ${currentOffset})`,
-									top: 0,
+									height: 2,
 									left: 0,
+									position: "absolute",
+									top: 0,
+									transform: `translate(calc(100cqw / ${showedWeekdays} * ${dateTime().weekday()}), calc(100cqh / ${hoursCount} / 60 * ${currentOffset})`,
+									width: `calc(100% / ${showedWeekdays})`,
 									zIndex: 3,
 								}}
 							>
 								<div
 									style={{
-										height: 12,
-										width: 12,
-										position: 'absolute',
-										top: -5,
-										left: -1,
-										background: 'red',
+										background: "red",
 										borderRadius: 999,
+										height: 12,
+										left: -1,
+										position: "absolute",
+										top: -5,
+										width: 12,
 									}}
 								/>
 							</div>
@@ -213,12 +201,12 @@ export const Schedule = ({
 						<div
 							key={i}
 							style={{
-								position: 'absolute',
-								top: quantumTimeUnitHeight * quantaInHour * i,
-								left: 0,
-								right: 0,
-								background: 'var(--g-color-line-generic)',
+								background: "var(--g-color-line-generic)",
 								height: 1,
+								left: 0,
+								position: "absolute",
+								right: 0,
+								top: quantumTimeUnitHeight * quantaInHour * i,
 							}}
 						/>
 					))}
@@ -232,18 +220,18 @@ export const Schedule = ({
 				{/* header */}
 				{Array.from({ length: showedWeekdays }, (_, i) => i).map(i => (
 					<Flex
-						key={i}
-						direction={'column'}
+						alignItems={"center"}
+						direction={"column"}
 						gap={2}
-						alignItems={'center'}
-						justifyContent={'center'}
+						justifyContent={"center"}
+						key={i}
 						style={{
 							gridColumn: i + 1 + 1,
 							gridRow: 1,
 						}}
 					>
-						<Text>{period.start.add(i, 'day').format('dd').toUpperCase()}</Text>
-						<Text variant="subheader-3">{period.start.add(i, 'day').format('DD')}</Text>
+						<Text>{period.start.add(i, "day").format("dd").toUpperCase()}</Text>
+						<Text variant="subheader-3">{period.start.add(i, "day").format("DD")}</Text>
 					</Flex>
 				))}
 				{/* hours */}
@@ -252,11 +240,11 @@ export const Schedule = ({
 						key={i}
 						style={{
 							gridColumn: 1,
-							gridRowStart: i + 1 + 1,
 							gridRowEnd: i + 1 + 1 + 1,
+							gridRowStart: i + 1 + 1,
 						}}
 					>
-						<Text variant="body-2" style={{ transform: 'translateY(-50%)', height: 'fit-content' }}>
+						<Text style={{ height: "fit-content", transform: "translateY(-50%)" }} variant="body-2">
 							{i + 9}:00
 						</Text>
 					</Flex>
