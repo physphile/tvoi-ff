@@ -32,9 +32,12 @@ jobs:
           root: dist
           clear: true
           include: |
-            dist/assets
-            dist/map
-            dist/icons
+            **/*.js
+            **/*.css
+            **/*.html
+            **/*.svg
+            **/*.png
+            **/*.webp
           cache-control: |
             *.html: no-cache, no-store, must-revalidate
             *.js: public, max-age=31536000, immutable
