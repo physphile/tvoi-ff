@@ -1,4 +1,4 @@
-import { createBrowserRouter, createRoutesFromElements, redirect, Route } from "react-router";
+import { createHashRouter, createRoutesFromElements, redirect, Route } from "react-router";
 
 import { HomePage } from "@/pages/HomePage";
 import { LoginPage } from "@/pages/login";
@@ -19,7 +19,7 @@ import { approveEmailEmailApproveGet } from "@/shared/api/auth";
 
 import { Layout } from "./Layout";
 
-export const router = createBrowserRouter(
+export const router = createHashRouter(
 	createRoutesFromElements(
 		<Route element={<Layout />} path="*">
 			<Route
