@@ -86,7 +86,6 @@ export const MapComponent = () => {
 
 	const { width = 0 } = useResizeObserver({
 		box: "border-box",
-		// @ts-expect-error - ref is not typed
 		ref,
 	});
 

@@ -83,7 +83,8 @@ export const LoginPage = () => {
 			return;
 		}
 
-		const errorMatch = loginError.message.match(/^No users found for(.*)account$/);
+		const errorDetail = loginError.detail?.find(({ msg }) => msg.match(/^No users found for(.*)account$/));
+		const errorMatch = errorDetail?.msg.match(/^No users found for(.*)account$/);
 		if (errorMatch) {
 			toaster.add({
 				actions: [
@@ -125,7 +126,7 @@ export const LoginPage = () => {
 					},
 				],
 				autoHiding: false,
-				content: `Нет пользователя с таким ${capitalize(errorMatch[1].trim())} аккаунтом. Зарегистрироваться?`,
+				content: `Нет пользователя с таким ${capitalize(errorMatch?.[1]?.trim() ?? "")} аккаунтом. Зарегистрироваться?`,
 				name: "login-method-error",
 				theme: "utility",
 			});
