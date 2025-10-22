@@ -25,7 +25,7 @@ jobs:
         run: npm run build
 
       - name: Deploy to Yandex Cloud S3
-        uses: yc-actions/yc-s3-upload@v1
+        uses: yc-actions/yc-obj-storage-upload@v3
         with:
           yc-sa-json-credentials: ${{ secrets.YC_SA_JSON_CREDENTIALS }}
           bucket: ${{ secrets.YC_S3_BUCKET }}
