@@ -93,6 +93,7 @@ export const MapComponent = () => {
 	const [lastDist, setLastDist] = useState(0);
 	const [dragStopped, setDragStopped] = useState(false);
 	const [scale, setScale] = useState(2);
+	const [isDragging, setIsDragging] = useState(false);
 
 	const pinch = useCallback(
 		(e: Konva.KonvaEventObject<TouchEvent>) => {
@@ -164,11 +165,26 @@ export const MapComponent = () => {
 		[dragStopped, lastCenter, lastDist, scale]
 	);
 
+	const onClick = useCallback(
+		(fn: () => unknown) => () => {
+			if (!isDragging) {
+				fn();
+			}
+		},
+		[isDragging]
+	);
+
 	return (
 		<Card ref={ref} style={{ position: "relative" }}>
 			<Stage
 				draggable
 				height={500}
+				onDragEnd={() => {
+					setIsDragging(false);
+				}}
+				onDragStart={() => {
+					setIsDragging(true);
+				}}
 				onTouchEnd={() => {
 					setLastDist(0);
 					setLastCenter(undefined);
@@ -190,9 +206,9 @@ export const MapComponent = () => {
 							strokeWidth={1}
 							{...room}
 							key={room.name}
-							onPointerClick={() => {
+							onPointerClick={onClick(() => {
 								navigate(`/map/${floor}/${room.name}`);
-							}}
+							})}
 						/>
 					))}
 				</Layer>
@@ -224,7 +240,9 @@ export const MapComponent = () => {
 								cornerRadius={2}
 								fill="white"
 								height={12}
-								onPointerClick={() => navigate(`/map/${floor}`)}
+								onPointerClick={onClick(() => {
+									navigate(`/map/${floor}`);
+								})}
 								onPointerEnter={e => {
 									const container = e.target.getStage()?.container();
 									if (container) {
@@ -286,9 +304,9 @@ export const MapComponent = () => {
 										<Rect
 											cornerRadius={4}
 											height={POPOVER_EVENT_HEIGHT}
-											onPointerClick={() => {
+											onPointerClick={onClick(() => {
 												navigate(`/timetable/events/${event.id}`);
-											}}
+											})}
 											onPointerEnter={e => {
 												const container = e.target.getStage()?.container();
 												if (container) {

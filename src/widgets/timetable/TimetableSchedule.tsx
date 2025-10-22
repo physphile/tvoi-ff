@@ -25,7 +25,7 @@ export const TimetableSchedule = ({ groupId, lecturerId, roomId }: TimetableSche
 				return { end: currentDate.add(1, "day"), start: currentDate };
 			}
 			case 3: {
-				return { end: currentDate.add(1, "day"), start: currentDate.subtract(1, "day") };
+				return { end: currentDate.add(2, "day"), start: currentDate.subtract(1, "day") };
 			}
 			case 7: {
 				return { end: currentDate.set({ weekday: 6 }), start: currentDate.set({ weekday: 0 }) };

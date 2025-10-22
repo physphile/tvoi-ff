@@ -3,11 +3,14 @@ import { Settings as GravitySettings } from "@gravity-ui/navigation";
 import { Icon, SegmentedRadioGroup } from "@gravity-ui/uikit";
 import { useLocalStorage } from "usehooks-ts";
 
+import { useMobile } from "@/shared/hooks";
+
 export const Settings = () => {
 	const [theme = "system", setTheme] = useLocalStorage("theme", "system");
+	const isMobile = useMobile();
 
 	return (
-		<GravitySettings filterPlaceholder="Поиск" title="Настройки">
+		<GravitySettings filterPlaceholder="Поиск" title="Настройки" view={isMobile ? "mobile" : "normal"}>
 			<GravitySettings.Page title="Внешний вид">
 				<GravitySettings.Section title="Интерфейс">
 					<GravitySettings.Item title="Тема интерфейса">

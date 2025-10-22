@@ -14,8 +14,9 @@
 	--g-text-display-font-weight: 600;
 	--g-text-accent-font-weight: 600;
 
-	--g-color-base-brand: #00014c;
-	--g-color-base-brand-hover: #00327a;
+	--g-color-base-brand: #1d3c86;
+	--g-color-text-brand-heavy: #00014c;
+	--g-color-base-brand-hover: #00014c;
 	--g-color-base-selection: rgba(82, 130, 255, 0.05);
 	--g-color-base-selection-hover: rgba(82, 130, 255, 0.1);
 	--g-color-line-brand: rgb(117, 155, 255);

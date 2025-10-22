@@ -101,7 +101,7 @@ export const EmailLoginForm = () => {
 
 	return (
 		<>
-			<form onSubmit={handleSubmit(onSubmit)}>
+			<form className={spacing({ p: 3 })} onSubmit={handleSubmit(onSubmit)}>
 				<Flex direction="column" gap={3}>
 					<TextInput {...register("email")} label="Email" size="xl" type="email" />
 					<PasswordInput

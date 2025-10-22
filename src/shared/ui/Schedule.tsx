@@ -70,8 +70,9 @@ export const Schedule = ({
 				const gridRowStart = Math.round(deltaStart / quantumTimeUnit) + 1;
 				const gridRowEnd = Math.round(deltaEnd / quantumTimeUnit) + 1;
 
-				const gridColumnStart = lcm * (d.day() - period.start.day()) + event.order;
-				const gridColumnEnd = gridColumnStart + lcm / event.intersections;
+				const columnWidth = lcm / event.intersections;
+				const gridColumnStart = lcm * (d.day() - period.start.day()) + columnWidth * (event.order - 1) + 1;
+				const gridColumnEnd = gridColumnStart + columnWidth;
 
 				return {
 					event,
@@ -96,6 +97,31 @@ export const Schedule = ({
 		}, 60e3);
 		return () => clearInterval(interval);
 	}, [getDayStart]);
+
+	const translateX = useMemo(() => {
+		switch (showedWeekdays) {
+			case 1: {
+				return `0`;
+			}
+			case 3: {
+				return `calc(100cqw / 3)`;
+			}
+			case 7: {
+				return `calc(100cqw / 7 * ${dateTime().weekday()})`;
+			}
+			default: {
+				return `0`;
+			}
+		}
+	}, [showedWeekdays]);
+
+	const showNowLine = useMemo(() => {
+		return (
+			dateTime().hour() < hourEnd &&
+			dateTime().hour() > hourStart &&
+			date.format("YYYY-MM-DD") === dateTime().format("YYYY-MM-DD")
+		);
+	}, [hourEnd, hourStart, date]);
 
 	return (
 		<Flex direction={"column"}>
@@ -166,36 +192,33 @@ export const Schedule = ({
 					))}
 
 					{/* now line */}
-					{dateTime().hour() < hourEnd &&
-						dateTime().hour() > hourStart &&
-						date.format("YYYY-MM-DD") === dateTime().format("YYYY-MM-DD") &&
-						dateTime().weekday() < showedWeekdays && (
+					{showNowLine && (
+						<div
+							style={{
+								background: "red",
+								borderRadius: 999,
+								height: 2,
+								left: 0,
+								position: "absolute",
+								top: 0,
+								transform: `translate(${translateX}, calc(100cqh / ${hoursCount} / 60 * ${currentOffset})`,
+								width: `calc(100% / ${showedWeekdays})`,
+								zIndex: 3,
+							}}
+						>
 							<div
 								style={{
 									background: "red",
 									borderRadius: 999,
-									height: 2,
-									left: 0,
+									height: 12,
+									left: -1,
 									position: "absolute",
-									top: 0,
-									transform: `translate(calc(100cqw / ${showedWeekdays} * ${dateTime().weekday()}), calc(100cqh / ${hoursCount} / 60 * ${currentOffset})`,
-									width: `calc(100% / ${showedWeekdays})`,
-									zIndex: 3,
+									top: -5,
+									width: 12,
 								}}
-							>
-								<div
-									style={{
-										background: "red",
-										borderRadius: 999,
-										height: 12,
-										left: -1,
-										position: "absolute",
-										top: -5,
-										width: 12,
-									}}
-								/>
-							</div>
-						)}
+							/>
+						</div>
+					)}
 					{/* grid lines */}
 					{[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(i => (
 						<div

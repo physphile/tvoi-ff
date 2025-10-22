@@ -1,11 +1,13 @@
 import { ArrowRightToSquare, Gear, LayoutHeaderCellsLarge, MapPin, Person, Persons, Printer } from "@gravity-ui/icons";
 import { UnableToDisplay } from "@gravity-ui/illustrations";
-import { AsideHeader, FooterItem, MobileHeader } from "@gravity-ui/navigation";
-import { Flex, Text, ToasterComponent } from "@gravity-ui/uikit";
+import { AsideHeader, FooterItem, MobileHeader, MobileHeaderFooterItem } from "@gravity-ui/navigation";
+import { Flex, Sheet, Text, ToasterComponent } from "@gravity-ui/uikit";
 import { useCallback, useMemo, useState } from "react";
 import { ErrorBoundary } from "react-error-boundary";
 import { Outlet, useLocation, useNavigate } from "react-router";
-import { useLocalStorage, useMediaQuery } from "usehooks-ts";
+import { useLocalStorage } from "usehooks-ts";
+
+import { useMobile } from "@/shared/hooks";
 
 import styles from "./Layout.module.css";
 import { Settings } from "./ui";
@@ -42,7 +44,7 @@ export const Layout = () => {
 
 	const [loginData] = useLocalStorage("login_data", undefined);
 
-	const isMobile = useMediaQuery("(max-width: 768px)");
+	const isMobile = useMobile();
 
 	const items = useMemo(
 		() => [
@@ -137,19 +139,41 @@ export const Layout = () => {
 		[loginData, compact, navigate, showSettings, location.pathname]
 	);
 
+	const renderMobileFooter = useCallback(
+		() => (
+			<>
+				<MobileHeaderFooterItem icon={Gear} onClick={() => setShowSettings(prev => !prev)} />
+				{loginData ? (
+					<MobileHeaderFooterItem icon={Person} onClick={() => navigate("/profile")} />
+				) : (
+					<MobileHeaderFooterItem icon={ArrowRightToSquare} onClick={() => navigate("/login")} />
+				)}
+			</>
+		),
+		[loginData, navigate, setShowSettings]
+	);
+
 	const panelItems = useMemo(() => [{ children: <Settings />, id: "kek", visible: showSettings }], [showSettings]);
 
 	if (isMobile) {
 		return (
-			<MobileHeader
-				burgerMenu={{ items, renderFooter }}
-				className={styles.mobileHeader}
-				contentClassName={styles.content}
-				logo={logo}
-				onClosePanel={() => setShowSettings(false)}
-				panelItems={panelItems}
-				renderContent={renderContent}
-			/>
+			<>
+				<MobileHeader
+					burgerMenu={{
+						items,
+						renderFooter: renderMobileFooter,
+					}}
+					className={styles.mobileHeader}
+					contentClassName={styles.content}
+					logo={logo}
+					onClosePanel={() => setShowSettings(false)}
+					panelItems={panelItems}
+					renderContent={renderContent}
+				/>
+				<Sheet onClose={() => setShowSettings(false)} visible={showSettings}>
+					<Settings />
+				</Sheet>
+			</>
 		);
 	}
 
